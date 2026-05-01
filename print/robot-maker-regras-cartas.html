@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>ROBOT MAKER — Regras &amp; Cartas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#1a1510;--dim:#7a6a50;--bg:#f0ebe0;--paper:#faf7f0;
+  --accent:#c44800;--gold:#9a7800;--blue:#1a4a8a;--green:#1a5a30;
+  --border:#c0aa80;--light:#e8e0cc;
+  --fh:'Bebas Neue',sans-serif;
+  --fm:'IBM Plex Mono',monospace;
+  --fb:'Crimson Pro',serif;
+  /* slot colours */
+  --comp:#1a4a8a;--opt:#9a7800;--forja:#8a1a1a;--dep:#1a5a30;
+}
+
+html{background:#aaa;}
+body{font-family:var(--fb);color:var(--ink);}
+
+/* ═══════════ PAGE COMMON ═══════════ */
+.page{
+  width:210mm;min-height:297mm;
+  background:var(--bg);
+  padding:8mm 9mm;
+  margin:0 auto 10mm;
+  position:relative;
+  overflow:hidden;
+}
+
+@media print{
+  html,body{background:white;margin:0;padding:0;}
+  .page{margin:0;page-break-after:always;box-shadow:none;}
+  .no-print{display:none;}
+}
+
+/* ═══════════ PAGE 1 — TABULEIRO ═══════════ */
+
+/* Header */
+.board-header{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  border-bottom:3px solid var(--ink);padding-bottom:3mm;margin-bottom:4mm;
+}
+.board-logo{font-family:var(--fh);font-size:2.2rem;letter-spacing:4px;line-height:1;}
+.board-logo em{color:var(--accent);font-style:normal;}
+.board-tagline{font-family:var(--fm);font-size:7pt;color:var(--dim);letter-spacing:1px;text-align:right;line-height:1.8;}
+
+/* Main grid: slots left, market right */
+.board-main{
+  display:grid;
+  grid-template-columns:52mm 1fr;
+  grid-template-rows:auto auto;
+  gap:4mm;
+  margin-bottom:4mm;
+}
+
+/* ── WORKER SLOTS ── */
+.slots-panel{display:flex;flex-direction:column;gap:3mm;}
+.slot-card{
+  border-radius:5px;padding:3mm 3.5mm;
+  border:2px solid;position:relative;
+  min-height:30mm;
+}
+.slot-rank{
+  position:absolute;top:2mm;right:3mm;
+  font-family:var(--fh);font-size:1.8rem;opacity:0.15;
+}
+.slot-icon{font-size:1.4rem;display:block;margin-bottom:1mm;}
+.slot-name{font-family:var(--fh);font-size:1rem;letter-spacing:2px;}
+.slot-effect{font-family:var(--fm);font-size:6.5pt;color:var(--dim);margin-top:1mm;line-height:1.5;}
+.slot-cap{
+  font-family:var(--fm);font-size:5.5pt;letter-spacing:1px;
+  padding:1px 4px;border-radius:2px;margin-top:1.5mm;display:inline-block;
+}
+.cap-inf{background:rgba(26,74,138,0.1);color:var(--comp);}
+.cap-excl{background:rgba(138,26,26,0.1);color:var(--forja);}
+
+/* worker placeholder dots in slot */
+.worker-dots{display:flex;gap:2mm;margin-top:2mm;flex-wrap:wrap;}
+.w-dot{
+  width:7mm;height:7mm;border-radius:50%;
+  border:1.5px dashed var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:6pt;color:var(--border);
+}
+
+/* ── MARKET ── */
+.market-panel{}
+.market-title{
+  font-family:var(--fh);font-size:0.85rem;letter-spacing:3px;
+  color:var(--dim);margin-bottom:2mm;
+}
+.market-tiers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2.5mm;margin-bottom:3mm;}
+.tier-col{}
+.tier-label{
+  font-family:var(--fh);font-size:0.72rem;letter-spacing:2px;
+  padding:1.5mm 2mm;margin-bottom:1.5mm;border-radius:3px;
+}
+.tier-l1{background:rgba(42,74,26,0.12);color:#2a4a1a;}
+.tier-l2{background:rgba(122,82,0,0.12);color:#7a5200;}
+.tier-l3{background:rgba(138,26,26,0.12);color:#8a1a1a;}
+.card-slot{
+  border:1.5px dashed var(--border);border-radius:4px;
+  height:22mm;margin-bottom:1.5mm;background:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fm);font-size:6pt;color:var(--border);
+  position:relative;
+}
+.card-slot-label{
+  position:absolute;bottom:2mm;right:2mm;
+  font-family:var(--fm);font-size:5.5pt;color:var(--border);
+}
+.tier-stock{
+  font-family:var(--fm);font-size:5.5pt;color:var(--dim);
+  text-align:center;letter-spacing:1px;
+}
+
+/* CPU section */
+.cpu-row{
+  border:1.5px solid rgba(26,74,138,0.3);border-radius:4px;
+  padding:2mm 3mm;background:rgba(26,74,138,0.03);
+}
+.cpu-row-title{font-family:var(--fh);font-size:0.72rem;letter-spacing:2px;color:var(--comp);margin-bottom:1.5mm;}
+.cpu-slots{display:flex;gap:2mm;}
+.cpu-card-slot{
+  border:1.5px dashed rgba(26,74,138,0.3);border-radius:3px;
+  flex:1;height:18mm;background:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fm);font-size:6pt;color:rgba(26,74,138,0.3);
+}
+
+/* ── CIRCUITS ── */
+.circuits-section{
+  border-top:2px solid var(--ink);padding-top:3mm;
+  display:grid;grid-template-columns:repeat(5,1fr) 40mm;gap:2.5mm;
+}
+.circuit-card-board{
+  border:2px solid var(--green);border-radius:5px;
+  padding:2.5mm;background:var(--paper);
+  position:relative;min-height:30mm;
+}
+.circuit-board-title{font-family:var(--fh);font-size:0.7rem;letter-spacing:1px;color:var(--green);}
+.circuit-board-slots{font-family:var(--fm);font-size:6pt;color:var(--dim);line-height:1.8;margin-top:1mm;}
+.circuit-worker-spot{
+  position:absolute;bottom:2.5mm;left:50%;transform:translateX(-50%);
+  width:9mm;height:9mm;border-radius:50%;
+  border:1.5px dashed #888;background:#f0f0e8;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9pt;color:#aaa;
+}
+
+/* Turn order panel */
+.turn-order-panel{
+  border:2px solid var(--ink);border-radius:5px;
+  padding:3mm;background:var(--paper);
+}
+.turn-order-title{font-family:var(--fh);font-size:0.78rem;letter-spacing:2px;color:var(--ink);margin-bottom:2mm;}
+.turn-row{display:flex;align-items:center;gap:2mm;margin-bottom:1.5mm;}
+.turn-round{font-family:var(--fm);font-size:6pt;color:var(--dim);width:12mm;}
+.turn-seq{display:flex;gap:1.5mm;}
+.turn-p{
+  width:7mm;height:7mm;border-radius:50%;
+  border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fh);font-size:6.5pt;color:var(--dim);
+}
+
+/* ── PLAYER BOARDS (bottom strip) ── */
+.player-strip{
+  border-top:2px solid var(--ink);padding-top:3mm;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;
+}
+.player-board{
+  border:2px solid var(--border);border-radius:4px;
+  padding:2.5mm;background:var(--paper);
+}
+.player-board-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:2mm;padding-bottom:1.5mm;border-bottom:1px solid var(--border);
+}
+.player-color{
+  width:6mm;height:6mm;border-radius:50%;border:1.5px solid rgba(0,0,0,0.2);
+}
+.player-label{font-family:var(--fh);font-size:0.75rem;letter-spacing:1px;color:var(--dim);}
+.player-workers{display:flex;gap:1.5mm;margin-bottom:2mm;}
+.pw{width:6mm;height:6mm;border-radius:50%;border:1.5px dashed var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:7pt;color:var(--border);}
+.pw.grey-pw{border-color:#888;color:#aaa;}
+.resource-row{display:flex;gap:1.5mm;align-items:center;margin-bottom:1mm;}
+.res-label{font-family:var(--fm);font-size:5.5pt;color:var(--dim);width:7mm;}
+.res-track{display:flex;gap:1mm;}
+.res-box{width:5mm;height:5mm;border:1px solid var(--border);border-radius:1px;background:var(--paper);}
+.robot-mini{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  grid-template-rows:1fr 1fr 1fr;
+  gap:1mm;margin-top:2mm;
+}
+.rm-slot{
+  border:1px dashed var(--border);border-radius:2px;
+  height:7mm;display:flex;align-items:center;justify-content:center;
+  font-size:7pt;
+}
+.rm-slot.cpu-mini{border-color:var(--comp);border-style:solid;}
+.rm-empty{background:transparent;border:none;}
+.score-track{
+  display:flex;gap:1mm;flex-wrap:wrap;margin-top:2mm;
+}
+.score-box{
+  width:5mm;height:5mm;border:1px solid var(--border);
+  border-radius:1px;background:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fm);font-size:4.5pt;color:var(--border);
+}
+
+/* board footer */
+.board-footer{
+  position:absolute;bottom:5mm;left:9mm;right:9mm;
+  display:flex;justify-content:space-between;
+  font-family:var(--fm);font-size:6pt;color:var(--border);letter-spacing:1px;
+}
+
+
+/* ═══════════ PAGE 2 — REGRAS ═══════════ */
+
+.rules-header{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  border-bottom:3px solid var(--ink);padding-bottom:3mm;margin-bottom:4mm;
+}
+.rules-logo{font-family:var(--fh);font-size:1.8rem;letter-spacing:4px;line-height:1;}
+.rules-logo em{color:var(--accent);font-style:normal;}
+.rules-sub{font-family:var(--fm);font-size:7pt;color:var(--dim);letter-spacing:2px;}
+
+.rules-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4.5mm;}
+.rules-col{}
+
+h1{font-family:var(--fh);font-size:0.88rem;letter-spacing:3px;color:var(--accent);
+  border-bottom:1.5px solid var(--accent);padding-bottom:1mm;margin:3mm 0 2mm;}
+h2{font-family:var(--fh);font-size:0.75rem;letter-spacing:2px;color:var(--ink);margin:2.5mm 0 1.5mm;}
+p{font-size:8.5pt;line-height:1.5;margin-bottom:1.5mm;}
+ul,ol{padding-left:3.5mm;margin-bottom:2mm;}
+li{font-size:8.5pt;line-height:1.55;margin-bottom:0.6mm;}
+li::marker{color:var(--accent);}
+
+table{width:100%;border-collapse:collapse;margin:1.5mm 0 2.5mm;font-size:7.5pt;}
+th{background:var(--ink);color:white;font-family:var(--fm);font-size:6.5pt;
+   letter-spacing:0.5px;padding:2mm 2.5mm;text-align:left;}
+td{padding:1.5mm 2.5mm;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.4;}
+tr:nth-child(even) td{background:var(--light);}
+
+.box{border-left:2.5px solid var(--accent);background:var(--paper);
+  padding:2mm 3mm;margin:1.5mm 0 2.5mm;font-size:8pt;line-height:1.5;}
+.box.blue{border-color:var(--blue);}
+.box.green{border-color:var(--green);}
+.box.gold{border-color:var(--gold);}
+.box-lbl{font-family:var(--fm);font-size:6pt;letter-spacing:1.5px;color:var(--accent);
+  text-transform:uppercase;margin-bottom:1mm;display:block;}
+.box.blue .box-lbl{color:var(--blue);}
+.box.green .box-lbl{color:var(--green);}
+.box.gold .box-lbl{color:var(--gold);}
+
+.rules-footer{
+  border-top:1px solid var(--border);margin-top:4mm;padding-top:2mm;
+  font-family:var(--fm);font-size:6pt;color:var(--border);
+  text-align:center;letter-spacing:1px;
+}
+
+/* print button */
+.print-btn{
+  position:fixed;bottom:20px;right:20px;z-index:100;
+  background:var(--accent);color:white;border:none;
+  padding:10px 20px;font-family:var(--fm);font-size:0.65rem;
+  letter-spacing:2px;cursor:pointer;border-radius:3px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+}
+.print-btn:hover{background:#a03a00;}
+
+/* ══ PIECES CSS ══ */
+
+:root {
+  --ink: #1a1510;
+  --bg: #f2ece0;
+  --paper: #faf6ee;
+  --border: #b8a880;
+  --dim: #7a6a50;
+  --l1: #4a7a3a;
+  --l2: #b87800;
+  --l3: #8a1a1a;
+  --cpu: #1a4a8a;
+  --head: #5a2080;
+  --chest: #1a6050;
+  --arm: #8a3a00;
+  --port: #004a6a;
+  --legs: #3a5a00;
+  --font-h: 'Bebas Neue', sans-serif;
+  --font-m: 'IBM Plex Mono', monospace;
+  --font-s: 'Syne', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #ddd8cc;
+  font-family: var(--font-m);
+  padding: 20px;
+  color: var(--ink);
+}
+
+@media print {
+  body { background: white; padding: 0; }
+  .no-print { display: none; }
+  .page { page-break-after: always; margin: 0; padding: 10mm; }
+  .card { break-inside: avoid; }
+}
+
+/* PAGE */
+.page {
+  background: var(--bg);
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto 20px;
+  padding: 12mm;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8mm;
+  padding-bottom: 4mm;
+  border-bottom: 2px solid var(--ink);
+}
+.page-title {
+  font-family: var(--font-h);
+  font-size: 1.6rem;
+  letter-spacing: 4px;
+  color: var(--ink);
+}
+.page-title em { color: #8a3a00; font-style: normal; }
+.page-sub {
+  font-family: var(--font-m);
+  font-size: 0.62rem;
+  color: var(--dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* SECTION */
+.section-label {
+  font-family: var(--font-s);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin: 6mm 0 3mm;
+  padding: 3px 8px;
+  display: inline-block;
+  color: white;
+}
+
+/* CARD GRID */
+.card-grid {
+  display: grid;
+  gap: 4mm;
+}
+.grid-5 { grid-template-columns: repeat(5, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+/* CARD BASE */
+.card {
+  background: var(--paper);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  position: relative;
+  aspect-ratio: 63/88;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card top stripe */
+.card-stripe {
+  height: 6px;
+  flex-shrink: 0;
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 3px 5px 4px;
+}
+
+/* Card header */
+.card-slot {
+  display: none;
+}
+
+.card-level {
+  position: absolute;
+  top: 8px;
+  right: 5px;
+  font-family: var(--font-h);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  padding: 0 4px;
+  border-radius: 2px;
+  color: white;
+}
+
+.card-icon {
+  font-size: 2.4rem;
+  text-align: center;
+  margin: 6px 0 4px;
+  line-height: 1;
+}
+
+.card-name {
+  font-family: var(--font-h);
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  text-align: center;
+  margin-bottom: 3px;
+}
+
+/* Divider */
+.card-div {
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+  opacity: 0.5;
+}
+
+/* Snippet */
+.card-snip {
+  font-size: 0.38rem;
+  line-height: 1.4;
+  color: var(--dim);
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 2px;
+}
+
+/* Cost + pts row */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2px;
+}
+.card-cost {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+.cost-token {
+  font-family: var(--font-h);
+  font-size: 0.5rem;
+  padding: 1px 3px;
+  border-radius: 2px;
+  color: white;
+  background: #444;
+}
+.cost-l1 { background: #2a4a1a; }
+.cost-l2 { background: #7a5200; }
+.card-pts {
+  font-family: var(--font-h);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+/* Stock indicator */
+.card-stock {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  font-family: var(--font-m);
+  font-size: 0.36rem;
+  color: var(--dim);
+  opacity: 0.7;
+}
+
+/* CPU card special */
+.card.cpu-card .card-body { padding-bottom: 3px; }
+.card-amp {
+  font-size: 0.37rem;
+  line-height: 1.4;
+  color: var(--cpu);
+  text-align: center;
+  font-weight: 500;
+  padding: 1px 2px;
+}
+
+/* ROBOT ANATOMY CARD */
+.robot-card {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 6px;
+  position: relative;
+}
+.robot-grid-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 3px;
+  aspect-ratio: 1;
+}
+.rslot {
+  border: 1.5px dashed var(--border);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 2px;
+  background: rgba(255,255,255,0.5);
+}
+.rslot.cpu-center {
+  border-color: var(--cpu);
+  border-style: solid;
+  background: rgba(26,74,138,0.05);
+}
+.rslot-icon { font-size: 1.1rem; }
+.rslot-lbl { font-family: var(--font-m); font-size: 0.38rem; letter-spacing: 1px; color: var(--dim); text-transform: uppercase; margin-top: 2px; }
+
+/* WORKER TOKEN */
+.token-grid { display: flex; gap: 4mm; flex-wrap: wrap; align-items: center; }
+.worker-token {
+  width: 14mm; height: 14mm;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-h);
+  font-size: 1.1rem;
+  color: white;
+  border: 2px solid rgba(0,0,0,0.2);
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
+}
+.block-token {
+  width: 10mm; height: 10mm;
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-h);
+  font-size: 0.7rem;
+  color: white;
+  border: 1.5px solid rgba(0,0,0,0.15);
+}
+
+/* SLOT CARD */
+.slot-card {
+  background: var(--paper);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.slot-rank { font-family: var(--font-h); font-size: 2rem; color: var(--border); float: right; line-height: 1; }
+.slot-icon-big { font-size: 1.5rem; }
+.slot-name { font-family: var(--font-h); font-size: 0.9rem; letter-spacing: 2px; }
+.slot-effect { font-size: 0.5rem; color: var(--dim); line-height: 1.5; }
+.slot-capacity { font-size: 0.44rem; font-weight: 500; margin-top: 2px; padding: 1px 5px; display: inline-block; border-radius: 2px; }
+.cap-unlimited { background: rgba(26,74,138,0.1); color: var(--cpu); }
+.cap-exclusive  { background: rgba(138,26,26,0.1); color: var(--l3); }
+
+/* CIRCUIT CARD */
+.circuit-card {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.circuit-name { font-family: var(--font-h); font-size: 0.7rem; letter-spacing: 1px; color: var(--ink); }
+.circuit-slots { font-size: 0.42rem; color: var(--dim); line-height: 1.5; }
+.circuit-reward { font-size: 0.42rem; font-weight: 500; color: #1a6050; margin-top: 3px; line-height: 1.4; }
+
+/* UI controls */
+.controls {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+}
+.btn-ctrl {
+  padding: 8px 16px;
+  background: var(--ink);
+  color: var(--bg);
+  border: none;
+  font-family: var(--font-m);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.btn-ctrl:hover { background: #8a3a00; }
+
+/* LEGEND */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4mm;
+  padding-top: 4mm;
+  border-top: 1px dashed var(--border);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.45rem;
+  color: var(--dim);
+}
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 2px;
+}
+
+
+@media print {
+  .page, .page.page-break { page-break-after: always; margin: 0; }
+  div[style*="width:297mm"] { page-break-after: always; }
+  .no-print { display: none; }
+}
+.print-btn {
+  position: fixed; bottom: 20px; right: 20px; z-index: 999;
+  background: #c44800; color: white; border: none;
+  padding: 10px 20px; font-family: var(--font-mono, monospace);
+  font-size: 0.7rem; letter-spacing: 2px; cursor: pointer;
+  border-radius: 3px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+
+@media print {
+  .page, .page.page-break { page-break-after: always; margin: 0; }
+  .no-print { display: none; }
+}
+.print-btn {
+  position: fixed; bottom: 20px; right: 20px; z-index: 999;
+  background: #c44800; color: white; border: none;
+  padding: 10px 20px; font-family: monospace;
+  font-size: 0.7rem; letter-spacing: 2px; cursor: pointer;
+  border-radius: 3px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+</style>
+</head>
+<body>
+<button class="print-btn no-print" onclick="window.print()">🖨 IMPRIMIR</button>
+
+<!-- ══ PÁG 2: REGRAS / verso do tabuleiro (laminar) ══ -->
+<div class="page page-break">
+
+  <div class="rules-header">
+    <div>
+      <div class="rules-logo">ROBOT <em>MAKER</em> — Regras</div>
+      <div class="rules-sub" style="margin-top:1mm">REFERÊNCIA RÁPIDA · VERSO DO TABULEIRO</div>
+    </div>
+    <div style="font-family:var(--fm);font-size:6.5pt;color:var(--dim);text-align:right;letter-spacing:1px;line-height:1.8">
+      2–4 jogadores · 45–90 min<br>
+      Setup: 3×L1 + 2 workers de cor<br>
+      + 5 workers cinzentos (1 por circuito)
+    </div>
+  </div>
+
+  <div class="rules-grid">
+
+  <!-- COLUNA 1 -->
+  <div class="rules-col">
+
+    <h1>O Robot — 6 Slots</h1>
+    <table>
+      <tr><th>Slot</th><th>Função</th></tr>
+      <tr><td>🧠 Cabeça</td><td>Detecção e análise</td></tr>
+      <tr><td>⚙️ CPU</td><td>Amplifica peças adjacentes</td></tr>
+      <tr><td>🦺 Tronco</td><td>Resistência e defesa</td></tr>
+      <tr><td>💪 Braço</td><td>Combate e força</td></tr>
+      <tr><td>🔧 Interface</td><td>Conectividade e hack</td></tr>
+      <tr><td>🦿 Pernas</td><td>Mobilidade</td></tr>
+    </table>
+    <div class="box blue">
+      <span class="box-lbl">Progressão obrigatória</span>
+      Slot vazia → L1 → L2 → L3<br>
+      Não podes saltar níveis. Upgrade substitui o snippet anterior.
+    </div>
+
+    <h1>Peças por Nível</h1>
+    <table>
+      <tr><th>Nível</th><th>Custo</th><th>Pts</th><th>Stock</th></tr>
+      <tr><td>L1 Base</td><td>2×L1</td><td>3–4</td><td>×4 (20)</td></tr>
+      <tr><td>L2 Avançado</td><td>1×L2</td><td>8</td><td>×2 (10)</td></tr>
+      <tr><td>L3 Elite</td><td>1×L1+1×L2</td><td>12–15</td><td>×1 (5)</td></tr>
+    </table>
+
+    <h1>CPU — Amplificação</h1>
+    <table>
+      <tr><th>CPU</th><th>L1</th><th>L2</th><th>L3</th></tr>
+      <tr><td>🟢 Bio</td><td>Cab ×2</td><td>Cab ×2.5</td><td>Cab+Pern ×3</td></tr>
+      <tr><td>🔴 Combat</td><td>Br+IF ×2</td><td>Br+IF ×2.5</td><td>Br+IF+Tr ×3</td></tr>
+      <tr><td>🟡 Agility</td><td>Pern ×2</td><td>Pern ×2.5</td><td>Pern+Cab ×3</td></tr>
+      <tr><td>🔵 Shield</td><td>Tr ×2</td><td>Tr ×2.5</td><td>Tr+Br+IF ×3</td></tr>
+      <tr><td>⚪ Omni L3</td><td colspan="3" style="color:var(--dim)">Todas as zonas ×1.5</td></tr>
+    </table>
+    <p style="font-size:7pt;color:var(--dim)">Cab=Cabeça · Tr=Tronco · Br=Braço · IF=Interface · Pern=Pernas</p>
+    <p style="font-size:7pt;color:var(--dim)">Stock CPU: L1×4 · L2×2 · L3×1 por tipo</p>
+
+  </div>
+
+  <!-- COLUNA 2 -->
+  <div class="rules-col">
+
+    <h1>Recursos e Tabuleiro</h1>
+    <table>
+      <tr><th>Slot</th><th>Cap</th><th>Efeito</th></tr>
+      <tr><td>🔵 Compilador</td><td>∞</td><td>+3 L1 por worker</td></tr>
+      <tr><td>🟡 Optimizador</td><td>∞</td><td>2×L1 → 1×L2</td></tr>
+      <tr><td>🔴 Forja</td><td>1×</td><td>Peça L1 grátis à escolha</td></tr>
+      <tr><td>🟢 Deploy</td><td>1×</td><td>+6 pts imediatos</td></tr>
+    </table>
+    <p style="font-size:7pt;color:var(--dim)">∞ = ilimitado · podes colocar os 2 workers no Compilador/Optimizador</p>
+
+    <h1>Estrutura do Turno</h1>
+    <p>Cada jogador usa <b>todos os seus workers</b> antes de passar ao próximo.</p>
+    <table>
+      <tr><th>Acção</th><th>Custo</th></tr>
+      <tr><td>Slot do tabuleiro</td><td>1 worker</td></tr>
+      <tr><td>Comprar peça mercado</td><td>1 worker + blocos</td></tr>
+      <tr><td>Passar</td><td>—</td></tr>
+    </table>
+
+    <h1>O Mercado</h1>
+    <ul>
+      <li>3 tiers visíveis + secção de CPUs.</li>
+      <li>Revela 4 cartas por tier no início de cada turno.</li>
+      <li>Quando stock = 0, carta desaparece.</li>
+      <li>Forja: escolhes qualquer L1 disponível, grátis.</li>
+    </ul>
+
+    <h1>Ordem de Turno</h1>
+    <p>Roda 1 posição por ronda automaticamente. Os slots <b>não</b> definem a ordem.</p>
+    <table>
+      <tr><th>Ronda</th><th>Ordem</th></tr>
+      <tr><td>1</td><td>P1→P2→P3→P4</td></tr>
+      <tr><td>2</td><td>P2→P3→P4→P1</td></tr>
+      <tr><td>3</td><td>P3→P4→P1→P2</td></tr>
+      <tr><td>4</td><td>P4→P1→P2→P3</td></tr>
+      <tr><td>5+</td><td style="color:var(--dim)">volta ao início</td></tr>
+    </table>
+
+  </div>
+
+  <!-- COLUNA 3 -->
+  <div class="rules-col">
+
+    <h1>Circuitos — Worker ⚙</h1>
+    <div class="box green">
+      <span class="box-lbl">Mecânica</span>
+      <b>Setup:</b> coloca o teu ⚙ numa carta de circuito.<br>
+      <b>Completas o circuito:</b> recolhes o ⚙ desse circuito — worker permanente.<br>
+      <b>Outro completou primeiro:</b> circuito esgota, o teu ⚙ é removido.<br>
+      <b>Limite:</b> máx. 3 workers por jogador · 5 ⚙ no jogo.
+    </div>
+    <table>
+      <tr><th>Circuito</th><th>Slots</th></tr>
+      <tr><td>Central</td><td>🧠+🦺+🦿</td></tr>
+      <tr><td>Combate</td><td>🧠+🦺+💪</td></tr>
+      <tr><td>Mobilidade</td><td>🦺+💪+🦿</td></tr>
+      <tr><td>Armas</td><td>💪+🔧+🦺</td></tr>
+      <tr><td>Processo</td><td>🧠+💪+🔧</td></tr>
+    </table>
+    <p style="font-size:7pt;color:var(--dim)">5 circuitos únicos — 1 por jogo total. 4 jogadores competem pelos 5.</p>
+
+    <h1>Fim do Jogo</h1>
+    <p><b>Trigger:</b> 6/6 slots preenchidas + 1 peça L3 → todos jogam +1 turno completo.</p>
+
+    <h1>Pontuação Final</h1>
+    <table>
+      <tr><th>Componente</th><th>Pts</th></tr>
+      <tr><td>Cada peça instalada</td><td>Valor base</td></tr>
+      <tr><td>Zona amplificada pela CPU</td><td>× factor</td></tr>
+      <tr><td>Robot completo (6/6)</td><td>+8</td></tr>
+      <tr><td>Tem peça L3</td><td>+5</td></tr>
+      <tr><td>Pontos acumulados</td><td>mantêm-se</td></tr>
+    </table>
+    <div class="box gold">
+      <span class="box-lbl">Exemplo</span>
+      Combat Core L3 amplifica Braço+Interface+Tronco ×3:<br>
+      Braço L2 (8×3=<b>24</b>) + Interface L2 (8×3=<b>24</b>) + Tronco L2 (8×3=<b>24</b>)<br>
+      + restantes peças + bónus → facilmente 100+ pts.
+    </div>
+
+    <h1>Setup Rápido</h1>
+    <ol>
+      <li>Revela 4 cartas por tier no mercado.</li>
+      <li>Distribui: 3×L1 + 2 workers de cor + 1 worker cinzento.</li>
+      <li>Cada jogador escolhe 1 circuito e coloca o ⚙.</li>
+      <li>Determina o P1 — a ordem roda sozinha.</li>
+    </ol>
+
+  </div>
+  </div><!-- end rules-grid -->
+
+  <div class="rules-footer">
+    ROBOT MAKER · David Marques · David Marques · CICF Maia · v0.2 · Tabuleiro no verso
+  </div>
+
+</div><!-- end page 2 -->
+
+<!-- ══ PÁG 3–5: PEÇAS (cartolina) ══ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">ROBOT <em>MAKER</em></div>
+    <div class="page-sub">Peças do Robot — Cartolina</div>
+  </div>
+
+  <!-- CABEÇA -->
+  <div class="section-label" style="background:var(--head)">🧠 Cabeça — 3 níveis</div>
+  <div class="card-grid grid-3" style="grid-template-columns: repeat(3, 1fr); max-width: 160mm;">
+    <!-- Head L1 -->
+    <div class="card">
+      <div class="card-stripe" style="background:var(--head)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l1)">L1</div>
+        <div class="card-icon">🧠</div>
+        <div class="card-name">Cabeça Básica</div>
+        <div class="card-div"></div>
+        <div class="card-snip">Detecção simples de ambiente</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">2×L1</span></div>
+          <div class="card-pts" style="color:var(--l1)">3pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×4</div>
+    </div>
+    <!-- Head L2 -->
+    <div class="card">
+      <div class="card-stripe" style="background:var(--head)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l2)">L2</div>
+        <div class="card-icon">📡</div>
+        <div class="card-name">Cabeça Sensor</div>
+        <div class="card-div"></div>
+        <div class="card-snip">Análise táctica e targeting</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l2)">8pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×2</div>
+    </div>
+    <!-- Head L3 -->
+    <div class="card">
+      <div class="card-stripe" style="background:var(--head)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l3)">L3</div>
+        <div class="card-icon">🤖</div>
+        <div class="card-name">Cabeça IA</div>
+        <div class="card-div"></div>
+        <div class="card-snip">Decisão autónoma de máx. retorno</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l3)">15pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×1</div>
+    </div>
+  </div>
+
+  <!-- TRONCO -->
+  <div class="section-label" style="background:var(--chest); margin-top:5mm">🦺 Tronco — 3 níveis</div>
+  <div class="card-grid grid-3" style="grid-template-columns: repeat(3, 1fr); max-width: 160mm;">
+    <div class="card">
+      <div class="card-stripe" style="background:var(--chest)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l1)">L1</div>
+        <div class="card-icon">🦺</div>
+        <div class="card-name">Tronco Leve</div>
+        <div class="card-div"></div>
+        <div class="card-snip">Absorção de impacto básica (10%)</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">2×L1</span></div>
+          <div class="card-pts" style="color:var(--l1)">4pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×4</div>
+    </div>
+    <div class="card">
+      <div class="card-stripe" style="background:var(--chest)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l2)">L2</div>
+        <div class="card-icon">🛡️</div>
+        <div class="card-name">Tronco Blindado</div>
+        <div class="card-div"></div>
+        <div class="card-snip">Redução de dano avançada (30%)</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l2)">8pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×2</div>
+    </div>
+    <div class="card">
+      <div class="card-stripe" style="background:var(--chest)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l3)">L3</div>
+        <div class="card-icon">🔮</div>
+        <div class="card-name">Tronco Adaptativo</div>
+        <div class="card-div"></div>
+        <div class="card-snip">Aprendizagem de padrão adversário</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l3)">12pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×1</div>
+    </div>
+  </div>
+
+  <!-- BRAÇO + INTERFACE lado a lado -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:5mm">
+    <div>
+      <div class="section-label" style="background:var(--arm)">💪 Braço — 3 níveis</div>
+      <div class="card-grid grid-3" style="margin-top:3mm">
+        <div class="card">
+          <div class="card-stripe" style="background:var(--arm)"></div>
+          <div class="card-body">
+<div class="card-level" style="background:var(--l1)">L1</div>
+            <div class="card-icon">💪</div>
+            <div class="card-name">Braço Simples</div>
+            <div class="card-div"></div>
+            <div class="card-snip">Força básica de combate</div>
+            <div class="card-footer">
+              <div class="card-cost"><span class="cost-token cost-l1">2×L1</span></div>
+              <div class="card-pts" style="color:var(--l1)">3pts</div>
+            </div>
+          </div>
+          <div class="card-stock">×4</div>
+        </div>
+        <div class="card">
+          <div class="card-stripe" style="background:var(--arm)"></div>
+          <div class="card-body">
+<div class="card-level" style="background:var(--l2)">L2</div>
+            <div class="card-icon">⚡</div>
+            <div class="card-name">Braço Laser</div>
+            <div class="card-div"></div>
+            <div class="card-snip">Ataque laser de alta precisão</div>
+            <div class="card-footer">
+              <div class="card-cost"><span class="cost-token cost-l2">1×L2</span></div>
+              <div class="card-pts" style="color:var(--l2)">8pts</div>
+            </div>
+          </div>
+          <div class="card-stock">×2</div>
+        </div>
+        <div class="card">
+          <div class="card-stripe" style="background:var(--arm)"></div>
+          <div class="card-body">
+<div class="card-level" style="background:var(--l3)">L3</div>
+            <div class="card-icon">🌀</div>
+            <div class="card-name">Braço Plasma</div>
+            <div class="card-div"></div>
+            <div class="card-snip">Ataque em área 3×3 casas</div>
+            <div class="card-footer">
+              <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+              <div class="card-pts" style="color:var(--l3)">12pts</div>
+            </div>
+          </div>
+          <div class="card-stock">×1</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="section-label" style="background:var(--port)">🔧 Interface — 3 níveis</div>
+      <div class="card-grid grid-3" style="margin-top:3mm">
+        <div class="card">
+          <div class="card-stripe" style="background:var(--port)"></div>
+          <div class="card-body">
+<div class="card-level" style="background:var(--l1)">L1</div>
+            <div class="card-icon">🔧</div>
+            <div class="card-name">Porta Série</div>
+            <div class="card-div"></div>
+            <div class="card-snip">Manipulação e hack básico</div>
+            <div class="card-footer">
+              <div class="card-cost"><span class="cost-token cost-l1">2×L1</span></div>
+              <div class="card-pts" style="color:var(--l1)">4pts</div>
+            </div>
+          </div>
+          <div class="card-stock">×4</div>
+        </div>
+        <div class="card">
+          <div class="card-stripe" style="background:var(--port)"></div>
+          <div class="card-body">
+<div class="card-level" style="background:var(--l2)">L2</div>
+            <div class="card-icon">🔗</div>
+            <div class="card-name">Porta Dados</div>
+            <div class="card-div"></div>
+            <div class="card-snip">Transferência de energia a aliados</div>
+            <div class="card-footer">
+              <div class="card-cost"><span class="cost-token cost-l2">1×L2</span></div>
+              <div class="card-pts" style="color:var(--l2)">8pts</div>
+            </div>
+          </div>
+          <div class="card-stock">×2</div>
+        </div>
+        <div class="card">
+          <div class="card-stripe" style="background:var(--port)"></div>
+          <div class="card-body">
+<div class="card-level" style="background:var(--l3)">L3</div>
+            <div class="card-icon">📡</div>
+            <div class="card-name">Antena Quântica</div>
+            <div class="card-div"></div>
+            <div class="card-snip">Controlo de campo gravitacional</div>
+            <div class="card-footer">
+              <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+              <div class="card-pts" style="color:var(--l3)">12pts</div>
+            </div>
+          </div>
+          <div class="card-stock">×1</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERNAS -->
+  <div class="section-label" style="background:var(--legs); margin-top:5mm">🦿 Pernas — 3 níveis</div>
+  <div class="card-grid grid-3" style="grid-template-columns: repeat(3, 1fr); max-width: 160mm;">
+    <div class="card">
+      <div class="card-stripe" style="background:var(--legs)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l1)">L1</div>
+        <div class="card-icon">🦿</div>
+        <div class="card-name">Pernas Standard</div>
+        <div class="card-div"></div>
+        <div class="card-snip">Deslocação básica (1 zona/turno)</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">2×L1</span></div>
+          <div class="card-pts" style="color:var(--l1)">3pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×4</div>
+    </div>
+    <div class="card">
+      <div class="card-stripe" style="background:var(--legs)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l2)">L2</div>
+        <div class="card-icon">🚀</div>
+        <div class="card-name">Pernas Turbo</div>
+        <div class="card-div"></div>
+        <div class="card-snip">Reposicionamento táctico óptimo</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l2)">8pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×2</div>
+    </div>
+    <div class="card">
+      <div class="card-stripe" style="background:var(--legs)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l3)">L3</div>
+        <div class="card-icon">🛸</div>
+        <div class="card-name">Pernas Gravitação</div>
+        <div class="card-div"></div>
+        <div class="card-snip">Teletransporte para qualquer zona</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l3)">12pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×1</div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--l1)"></div> L1 — Base (stock ×4)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--l2)"></div> L2 — Avançado (stock ×2)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--l3)"></div> L3 — Elite (stock ×1)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--dim)"></div> ×N = cópias disponíveis</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2a4a1a"></div> Custo L1</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7a5200"></div> Custo L2</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- PÁGINA 2 — CPUs                                           -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">ROBOT <em>MAKER</em></div>
+    <div class="page-sub">CPUs — Cartolina (Pág 4/5)</div>
+  </div>
+
+  <div class="section-label" style="background:var(--cpu)">⚙️ CPUs — Nível 1 (stock ×4 cada)</div>
+  <div class="card-grid grid-4" style="margin-top:3mm">
+    <!-- Bio L1 -->
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--cpu)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l1)">L1</div>
+        <div class="card-icon">🟢</div>
+        <div class="card-name">Bio-Core</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Cabeça ×2</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">2×L1</span></div>
+          <div class="card-pts" style="color:var(--l1)">5pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×4</div>
+    </div>
+    <!-- Combat L1 -->
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--cpu)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l1)">L1</div>
+        <div class="card-icon">🔴</div>
+        <div class="card-name">Combat Core</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Braço + Interface ×2</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">2×L1</span></div>
+          <div class="card-pts" style="color:var(--l1)">5pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×4</div>
+    </div>
+    <!-- Agility L1 -->
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--cpu)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l1)">L1</div>
+        <div class="card-icon">🟡</div>
+        <div class="card-name">Agility Core</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Pernas ×2</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">2×L1</span></div>
+          <div class="card-pts" style="color:var(--l1)">5pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×4</div>
+    </div>
+    <!-- Shield L1 -->
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--cpu)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l1)">L1</div>
+        <div class="card-icon">🔵</div>
+        <div class="card-name">Shield Core</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Tronco ×2</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">2×L1</span></div>
+          <div class="card-pts" style="color:var(--l1)">5pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×4</div>
+    </div>
+  </div>
+
+  <div class="section-label" style="background:var(--cpu); margin-top:5mm">⚙️ CPUs — Nível 2 (stock ×2 cada)</div>
+  <div class="card-grid grid-4" style="margin-top:3mm">
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--cpu)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l2)">L2</div>
+        <div class="card-icon">🟢</div>
+        <div class="card-name">Bio-Core MK2</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Cabeça ×2.5</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l2)">9pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×2</div>
+    </div>
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--cpu)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l2)">L2</div>
+        <div class="card-icon">🔴</div>
+        <div class="card-name">Combat MK2</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Braço + Interface ×2.5</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l2)">9pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×2</div>
+    </div>
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--cpu)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l2)">L2</div>
+        <div class="card-icon">🟡</div>
+        <div class="card-name">Agility MK2</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Pernas ×2.5</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l2)">9pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×2</div>
+    </div>
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--cpu)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l2)">L2</div>
+        <div class="card-icon">🔵</div>
+        <div class="card-name">Shield MK2</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Tronco ×2.5</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l2)">9pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×2</div>
+    </div>
+  </div>
+
+  <div class="section-label" style="background:var(--cpu); margin-top:5mm">⚙️ CPUs — Nível 3 ELITE (stock ×1 cada)</div>
+  <div class="card-grid grid-4" style="margin-top:3mm; grid-template-columns: repeat(5,1fr)">
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--l3)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l3)">L3</div>
+        <div class="card-icon">🟢</div>
+        <div class="card-name">Bio-Core MK3</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Cabeça + Pernas ×2</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l3)">14pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×1</div>
+    </div>
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--l3)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l3)">L3</div>
+        <div class="card-icon">🔴</div>
+        <div class="card-name">Combat MK3</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Braço+Interface+Tronco ×2</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l3)">14pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×1</div>
+    </div>
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--l3)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l3)">L3</div>
+        <div class="card-icon">🟡</div>
+        <div class="card-name">Agility MK3</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Pernas + Cabeça ×2</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l3)">14pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×1</div>
+    </div>
+    <div class="card cpu-card">
+      <div class="card-stripe" style="background:var(--l3)"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l3)">L3</div>
+        <div class="card-icon">🔵</div>
+        <div class="card-name">Shield MK3</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Tronco+Braço+Interface ×2</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">1×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l3)">14pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×1</div>
+    </div>
+    <div class="card cpu-card" style="border-color:var(--l3)">
+      <div class="card-stripe" style="background:linear-gradient(90deg,var(--head),var(--chest),var(--arm),var(--legs))"></div>
+      <div class="card-body">
+<div class="card-level" style="background:var(--l3)">L3</div>
+        <div class="card-icon">⚪</div>
+        <div class="card-name">Omni Core</div>
+        <div class="card-div"></div>
+        <div class="card-amp">Todas as slots ×1.5</div>
+        <div class="card-footer">
+          <div class="card-cost"><span class="cost-token cost-l1">2×L1</span><span class="cost-token cost-l2">1×L2</span></div>
+          <div class="card-pts" style="color:var(--l3)">18pts</div>
+        </div>
+      </div>
+      <div class="card-stock">×1</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- PÁGINA 3 — TABULEIRO, TOKENS, CIRCUITOS                   -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">ROBOT <em>MAKER</em></div>
+    <div class="page-sub">Circuitos & Tokens — Cartolina (Pág 5/5)</div>
+  </div>
+
+  <!-- ROBOT ANATOMY -->
+  <div class="section-label" style="background:var(--ink); margin-top:5mm">🤖 Anatomia do Robot (tabuleiro de jogador)</div>
+  <div style="display:grid;grid-template-columns:140px 1fr;gap:6mm;margin-top:3mm;align-items:start">
+    <div class="robot-card">
+      <div style="font-family:var(--font-h);font-size:0.65rem;letter-spacing:2px;color:var(--dim);margin-bottom:4px;text-align:center">ROBOT</div>
+      <div class="robot-grid-inner">
+        <div class="rslot"><div class="rslot-icon">🧠</div><div class="rslot-lbl">Cabeça</div></div>
+        <div class="rslot cpu-center"><div class="rslot-icon">⚙️</div><div class="rslot-lbl" style="color:var(--cpu)">CPU</div></div>
+        <div class="rslot"><div class="rslot-icon">🦺</div><div class="rslot-lbl">Tronco</div></div>
+        <div class="rslot"><div class="rslot-icon">💪</div><div class="rslot-lbl">Braço</div></div>
+        <div style="border:none"></div>
+        <div class="rslot"><div class="rslot-icon">🔧</div><div class="rslot-lbl">Interface</div></div>
+        <div style="border:none"></div>
+        <div class="rslot"><div class="rslot-icon">🦿</div><div class="rslot-lbl">Pernas</div></div>
+        <div style="border:none"></div>
+      </div>
+      <div style="font-size:0.38rem;color:var(--dim);text-align:center;margin-top:4px">CPU amplifica peças adjacentes</div>
+    </div>
+    <div>
+      <div style="font-size:0.52rem;color:var(--dim);line-height:1.8">
+        <strong style="color:var(--ink)">Progressão obrigatória:</strong> slot vazia → L1 → L2 → L3<br>
+        <strong style="color:var(--ink)">Robot completo:</strong> 6/6 slots preenchidas + 1 peça L3<br>
+        <strong style="color:var(--ink)">CPU:</strong> amplifica as peças na sua zona de influência<br>
+        <strong style="color:var(--ink)">Upgrade:</strong> substitui o snippet anterior (só o mais recente conta)
+      </div>
+    </div>
+  </div>
+
+  <!-- TOKENS -->
+  <div class="section-label" style="background:var(--ink); margin-top:5mm">🔘 Tokens de Workers</div>
+  <div style="margin-top:3mm">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6mm">
+      <!-- Workers por cor -->
+      <div>
+        <div style="font-family:var(--font-m);font-size:0.52rem;color:var(--dim);margin-bottom:3mm">
+          <b style="color:var(--ink)">Workers de cor</b> — 2 por jogador (setup)
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4mm">
+          <div class="token-grid">
+            <div class="worker-token" style="background:#1a4a8a">DAV</div>
+            <div class="worker-token" style="background:#1a4a8a">DAV</div>
+            <div style="font-size:0.46rem;color:var(--dim);align-self:center">× 2 cada</div>
+          </div>
+          <div class="token-grid">
+            <div class="worker-token" style="background:#8a1a1a">B7</div>
+            <div class="worker-token" style="background:#8a1a1a">B7</div>
+          </div>
+          <div class="token-grid">
+            <div class="worker-token" style="background:#1a6050">GX</div>
+            <div class="worker-token" style="background:#1a6050">GX</div>
+          </div>
+          <div class="token-grid">
+            <div class="worker-token" style="background:#6a4a10">LM</div>
+            <div class="worker-token" style="background:#6a4a10">LM</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Worker cinzento -->
+      <div>
+        <div style="font-family:var(--font-m);font-size:0.52rem;color:var(--dim);margin-bottom:3mm">
+          <b style="color:var(--ink)">Worker cinzento</b> — 1 por circuito, 5 no total
+        </div>
+        <div class="token-grid" style="margin-bottom:3mm">
+          <div class="worker-token" style="background:#888;color:white;border:2px solid #555">⚙</div>
+          <div class="worker-token" style="background:#888;color:white;border:2px solid #555">⚙</div>
+          <div class="worker-token" style="background:#888;color:white;border:2px solid #555">⚙</div>
+          <div class="worker-token" style="background:#888;color:white;border:2px solid #555">⚙</div>
+          <div style="font-size:0.46rem;color:var(--dim);align-self:center">× 5 total (1 por circuito)</div>
+        </div>
+        <div style="background:#f8f5ee;border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:0.46rem;line-height:1.8;color:var(--dim)">
+          <b style="color:var(--ink)">Setup:</b> coloca 1 worker cinzento em cada carta de circuito (5 no total).<br>
+          <b style="color:var(--ink)">Quando completa:</b> recolhe o worker e adiciona ao seu pool.<br>
+          <b style="color:var(--ink)">Limite:</b> máx. 1 worker cinzento por jogador (3 workers total).<br>
+          <b style="color:var(--ink)">Circuito esgotado:</b> se outro jogador tiver o mesmo, esse fica sem bonus.
+        </div>
+      </div>
+    </div>
+
+    <div style="font-family:var(--font-m);font-size:0.52rem;color:var(--dim);margin:4mm 0 2mm"><b style="color:var(--ink)">Blocos de Código</b></div>
+    <div class="token-grid">
+      <div class="block-token" style="background:#2a4a1a">L1</div>
+      <div class="block-token" style="background:#2a4a1a">L1</div>
+      <div class="block-token" style="background:#2a4a1a">L1</div>
+      <div style="font-size:0.5rem;color:var(--dim)">× 60 total</div>
+      <div style="width:6mm"></div>
+      <div class="block-token" style="background:#7a5200">L2</div>
+      <div class="block-token" style="background:#7a5200">L2</div>
+      <div style="font-size:0.5rem;color:var(--dim)">× 30 total</div>
+    </div>
+  </div>
+
+  <!-- CIRCUITOS — 5 únicos -->
+  <div class="section-label" style="background:#1a6050; margin-top:5mm">⚡ Cartas de Circuito — 5 únicas no jogo total</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3mm;margin-top:3mm">
+
+    <!-- Cada carta de circuito tem slot para o worker cinzento -->
+    <div class="circuit-card" style="border-color:#1a6050;border-width:2px">
+      <div class="circuit-name" style="color:#1a6050">Circuito Central</div>
+      <div class="circuit-slots">🧠 Cabeça<br>🦺 Tronco<br>🦿 Pernas</div>
+      <div style="display:flex;align-items:center;gap:4px;margin-top:4px;padding-top:4px;border-top:1px dashed var(--border)">
+        <div style="width:14px;height:14px;border-radius:50%;background:#ddd;border:1.5px dashed #888;display:flex;align-items:center;justify-content:center;font-size:0.4rem;color:#888">⚙</div>
+        <div style="font-size:0.38rem;color:var(--dim)">⚙ colocado no setup</div>
+      </div>
+      <div class="circuit-reward">→ recolhe este ⚙ quando completar</div>
+    </div>
+
+    <div class="circuit-card" style="border-color:#1a6050;border-width:2px">
+      <div class="circuit-name" style="color:#1a6050">Circuito de Combate</div>
+      <div class="circuit-slots">🧠 Cabeça<br>🦺 Tronco<br>💪 Braço</div>
+      <div style="display:flex;align-items:center;gap:4px;margin-top:4px;padding-top:4px;border-top:1px dashed var(--border)">
+        <div style="width:14px;height:14px;border-radius:50%;background:#ddd;border:1.5px dashed #888;display:flex;align-items:center;justify-content:center;font-size:0.4rem;color:#888">⚙</div>
+        <div style="font-size:0.38rem;color:var(--dim)">⚙ colocado no setup</div>
+      </div>
+      <div class="circuit-reward">→ recolhe este ⚙ quando completar</div>
+    </div>
+
+    <div class="circuit-card" style="border-color:#1a6050;border-width:2px">
+      <div class="circuit-name" style="color:#1a6050">Circuito de Mobilidade</div>
+      <div class="circuit-slots">🦺 Tronco<br>💪 Braço<br>🦿 Pernas</div>
+      <div style="display:flex;align-items:center;gap:4px;margin-top:4px;padding-top:4px;border-top:1px dashed var(--border)">
+        <div style="width:14px;height:14px;border-radius:50%;background:#ddd;border:1.5px dashed #888;display:flex;align-items:center;justify-content:center;font-size:0.4rem;color:#888">⚙</div>
+        <div style="font-size:0.38rem;color:var(--dim)">⚙ colocado no setup</div>
+      </div>
+      <div class="circuit-reward">→ recolhe este ⚙ quando completar</div>
+    </div>
+
+    <div class="circuit-card" style="border-color:#1a6050;border-width:2px">
+      <div class="circuit-name" style="color:#1a6050">Circuito de Armas</div>
+      <div class="circuit-slots">💪 Braço<br>🔧 Interface<br>🦺 Tronco</div>
+      <div style="display:flex;align-items:center;gap:4px;margin-top:4px;padding-top:4px;border-top:1px dashed var(--border)">
+        <div style="width:14px;height:14px;border-radius:50%;background:#ddd;border:1.5px dashed #888;display:flex;align-items:center;justify-content:center;font-size:0.4rem;color:#888">⚙</div>
+        <div style="font-size:0.38rem;color:var(--dim)">⚙ colocado no setup</div>
+      </div>
+      <div class="circuit-reward">→ recolhe este ⚙ quando completar</div>
+    </div>
+
+    <div class="circuit-card" style="border-color:#1a6050;border-width:2px">
+      <div class="circuit-name" style="color:#1a6050">Circuito de Processo</div>
+      <div class="circuit-slots">🧠 Cabeça<br>💪 Braço<br>🔧 Interface</div>
+      <div style="display:flex;align-items:center;gap:4px;margin-top:4px;padding-top:4px;border-top:1px dashed var(--border)">
+        <div style="width:14px;height:14px;border-radius:50%;background:#ddd;border:1.5px dashed #888;display:flex;align-items:center;justify-content:center;font-size:0.4rem;color:#888">⚙</div>
+        <div style="font-size:0.38rem;color:var(--dim)">⚙ colocado no setup</div>
+      </div>
+      <div class="circuit-reward">→ recolhe este ⚙ quando completar</div>
+    </div>
+
+  </div>
+
+
+
+  <div style="margin-top:5mm;text-align:center;font-family:var(--font-m);font-size:0.45rem;color:var(--dim)">
+    ROBOT MAKER · Protótipo v0.1 · CICF Maia · Todas as peças sujeitas a alteração
+  </div>
+</div>
+
+</body>
+</html>

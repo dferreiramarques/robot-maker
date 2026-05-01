@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROBOT MAKER v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0d0b;--panel:#161410;--card:#1e1b16;--border:#2e2a22;--ink:#e0d8c8;--dim:#605848;
+  --p0:#5aafff;--p0d:#1a3a5a;--p1:#ff6060;--p1d:#6a1818;--p2:#50ff90;--p2d:#185a30;--p3:#ffd060;--p3d:#6a4a10;
+  --acc:#ff8c2a;--gold:#ffd060;--ok:#50ff90;--warn:#ff6060;
+  --fh:'Bebas Neue',sans-serif;--fm:'IBM Plex Mono',monospace;
+  --sc:#5aafff;--so:#ffd060;--sf:#ff6060;--sd:#50ff90;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--ink);font-family:var(--fm);font-size:13px;}
+/* LAYOUT */
+.root{display:grid;grid-template-columns:185px 1fr 175px 265px;grid-template-rows:42px 1fr;height:100vh;}
+/* HEADER */
+header{grid-column:1/-1;background:var(--panel);border-bottom:2px solid var(--border);
+  display:flex;align-items:center;gap:14px;padding:0 12px;}
+.logo{font-family:var(--fh);font-size:1.4rem;letter-spacing:3px;color:var(--acc);}
+.logo em{color:var(--ink);opacity:0.3;font-style:normal;}
+.sep{width:1px;height:18px;background:var(--border);}
+.hi{font-size:0.58rem;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
+.hv{color:var(--ink);}
+.tos{display:flex;gap:4px;align-items:center;margin-left:auto;}
+.tol{font-size:0.52rem;letter-spacing:2px;color:var(--dim);}
+.tob{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--fh);font-size:0.6rem;border:2px solid transparent;transition:all 0.3s;}
+.tob.cur{transform:scale(1.3);box-shadow:0 0 10px currentColor;}
+/* PANELS */
+.pnl{overflow-y:auto;padding:9px;}
+.pt{font-family:var(--fh);font-size:0.78rem;letter-spacing:3px;color:var(--dim);
+  text-transform:uppercase;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+/* RULES */
+.rules{background:var(--panel);border-right:2px solid var(--border);}
+.rb{margin-bottom:9px;}
+.rh{font-size:0.52rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:3px;}
+.rt{font-size:0.58rem;line-height:1.8;color:var(--dim);}
+.rt b{color:var(--ink);}
+.ra{background:rgba(255,140,42,0.08);border-left:2px solid var(--acc);padding:5px 7px;
+  font-size:0.58rem;line-height:1.7;color:var(--acc);margin-top:5px;animation:rp 2s infinite;}
+@keyframes rp{0%,100%{opacity:1}50%{opacity:0.5}}
+.endwarn{background:rgba(255,96,96,0.1);border-left:2px solid var(--warn);padding:5px 7px;
+  font-size:0.58rem;color:var(--warn);margin-top:5px;display:none;}
+.endwarn.show{display:block;}
+/* BOARD */
+.board{border-right:1px solid var(--border);}
+.slot-c{background:var(--card);border:2px solid var(--border);border-radius:4px;padding:8px;
+  position:relative;margin-bottom:7px;transition:border-color 0.2s;}
+.slot-c.cl{cursor:pointer;}
+.slot-c.cl:hover{border-color:var(--p0);}
+.s-rank{position:absolute;top:4px;right:6px;font-family:var(--fh);font-size:0.95rem;color:var(--dim);}
+.s-ico{font-size:1.1rem;}
+.s-nm{font-family:var(--fh);font-size:0.8rem;letter-spacing:1px;}
+.s-fx{font-size:0.55rem;color:var(--dim);margin-top:2px;line-height:1.5;}
+.s-wk{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap;}
+.wc{width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--fh);font-size:0.58rem;border:1px solid rgba(255,255,255,0.1);}
+.s-mu{font-size:0.5rem;color:var(--dim);margin-top:2px;letter-spacing:1px;}
+/* MARKET */
+.mkt{border-right:1px solid var(--border);}
+.pc{background:var(--card);border:2px solid var(--border);border-radius:4px;padding:6px;
+  margin-bottom:6px;position:relative;transition:all 0.15s;}
+.pc.by{cursor:pointer;}
+.pc.by:hover{border-color:var(--p0);transform:translateX(2px);}
+.pc.sd{opacity:0.28;}
+.pc.sd::after{content:'VENDIDA';position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-family:var(--fh);font-size:0.7rem;letter-spacing:2px;
+  color:var(--acc);background:rgba(14,13,11,0.8);}
+.pc.cpu-card{border-color:rgba(255,208,96,0.3);}
+.plv{font-size:0.46rem;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
+.pnr{display:flex;align-items:center;gap:4px;margin:2px 0;}
+.pi{font-size:1rem;}
+.pn{font-family:var(--fh);font-size:0.75rem;letter-spacing:1px;}
+.pcs{display:flex;gap:3px;margin:3px 0;}
+.cb{padding:1px 4px;border-radius:2px;font-family:var(--fh);font-size:0.58rem;}
+.cbl1{background:var(--border);color:var(--ink);}
+.cbl2{background:var(--p3d);color:var(--gold);}
+.psn{font-size:0.53rem;color:var(--ok);border-top:1px solid var(--border);padding-top:3px;margin-top:3px;line-height:1.5;}
+.pamp{font-size:0.53rem;color:var(--gold);border-top:1px solid var(--border);padding-top:3px;margin-top:3px;line-height:1.5;}
+.ppt{position:absolute;top:4px;right:4px;font-family:var(--fh);font-size:0.8rem;color:var(--gold);}
+.pod{position:absolute;bottom:4px;right:4px;width:13px;height:13px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:0.46rem;color:white;}
+.mkt-section{font-size:0.6rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;
+  margin:10px 0 5px;padding:4px 0 4px;border-bottom:1px solid rgba(255,208,96,0.2);
+  display:flex;justify-content:space-between;align-items:center;}
+.tier-section{margin-bottom:14px;}
+.tier-header{display:flex;align-items:center;justify-content:space-between;
+  padding:6px 8px;border-radius:3px;margin-bottom:6px;}
+.tier-header.t1{background:rgba(100,180,100,0.08);border:1px solid rgba(100,180,100,0.2);}
+.tier-header.t2{background:rgba(255,208,96,0.08);border:1px solid rgba(255,208,96,0.2);}
+.tier-header.t3{background:rgba(255,96,96,0.08);border:1px solid rgba(255,96,96,0.2);}
+.tier-label{font-family:var(--fh);font-size:0.85rem;letter-spacing:2px;}
+.tier-label.t1{color:#64b464;}
+.tier-label.t2{color:var(--gold);}
+.tier-label.t3{color:var(--warn);}
+.tier-deck{font-size:0.6rem;color:var(--dim);display:flex;gap:8px;align-items:center;}
+.deck-count{font-family:var(--fh);font-size:0.75rem;}
+.deck-count.t1{color:#64b464;}
+.deck-count.t2{color:var(--gold);}
+.deck-count.t3{color:var(--warn);}
+.tier-cards{display:flex;flex-direction:column;gap:5px;}
+/* RIGHT */
+.right{display:flex;flex-direction:column;overflow:hidden;}
+/* ROBOT ANATOMY */
+.robot-wrap{padding:8px;border-bottom:2px solid var(--border);}
+.robot-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;}
+.rslot{background:var(--card);border:2px solid var(--border);border-radius:3px;padding:5px;
+  text-align:center;min-height:58px;position:relative;transition:border-color 0.2s;}
+.rslot.filled{border-color:rgba(90,175,255,0.3);}
+.rslot.cpu-slot{border-color:rgba(255,208,96,0.3);background:rgba(255,208,96,0.03);}
+.rslot.cpu-slot.filled{border-color:var(--gold);}
+.rslot-label{font-size:0.48rem;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:3px;}
+.rslot-content{font-size:0.85rem;}
+.rslot-name{font-size:0.52rem;color:var(--p0);line-height:1.3;margin-top:2px;}
+.rslot-level{font-size:0.46rem;color:var(--dim);}
+.rslot-pts{position:absolute;top:3px;right:4px;font-family:var(--fh);font-size:0.65rem;color:var(--gold);}
+.rslot-amp{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:0.46rem;color:var(--gold);}
+.rslot-upgrade{font-size:0.42rem;color:var(--warn);margin-top:1px;}
+.empty-slot{font-size:0.52rem;color:var(--dim);opacity:0.4;padding-top:8px;}
+/* PLAYERS */
+.pw{padding:7px;border-bottom:2px solid var(--border);}
+.plc{background:var(--card);border:2px solid var(--border);border-radius:3px;padding:6px;
+  margin-bottom:5px;transition:all 0.3s;}
+.plc.ct{box-shadow:0 0 0 2px currentColor;}
+.ph{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.pav{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--fh);font-size:0.65rem;color:white;flex-shrink:0;}
+.pnm{font-family:var(--fh);font-size:0.8rem;letter-spacing:1px;flex:1;}
+.psc{font-family:var(--fh);font-size:1.05rem;}
+.ptg{font-size:0.46rem;letter-spacing:1px;color:var(--dim);}
+.prs{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:3px;}
+.rs{padding:1px 4px;border-radius:2px;background:var(--border);font-size:0.55rem;}
+/* LOG */
+.la{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.lh{padding:4px 9px;border-bottom:1px solid var(--border);font-size:0.52rem;
+  letter-spacing:2px;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between;}
+.lb{flex:1;overflow-y:auto;padding:6px 9px;}
+.le{margin-bottom:5px;}
+.lw{font-family:var(--fh);font-size:0.6rem;letter-spacing:1px;}
+.lx{font-size:0.58rem;color:var(--dim);line-height:1.6;margin-top:1px;}
+.lr{font-size:0.52rem;color:var(--border);font-style:italic;margin-top:1px;padding-left:6px;border-left:2px solid var(--border);}
+.c0{color:var(--p0);}.c1{color:var(--p1);}.c2{color:var(--p2);}.c3{color:var(--p3);}.cs{color:var(--dim);}
+/* ACTION BAR */
+.ab{padding:7px 9px;background:var(--panel);border-top:2px solid var(--border);}
+.ah{font-size:0.58rem;color:var(--dim);line-height:1.6;margin-bottom:5px;font-style:italic;}
+.br{display:flex;gap:5px;flex-wrap:wrap;}
+.btn{padding:5px 9px;border:2px solid;border-radius:3px;font-family:var(--fm);
+  font-size:0.58rem;cursor:pointer;background:transparent;letter-spacing:1px;transition:all 0.15s;}
+.bsk{border-color:var(--dim);color:var(--dim);}.bsk:hover{background:var(--dim);color:var(--bg);}
+.be{border-color:var(--acc);color:var(--acc);}.be:hover{background:var(--acc);color:var(--bg);}
+.btn:disabled{opacity:0.3;cursor:default;}
+/* MODAL OVERLAY */
+.modal{display:flex;visibility:hidden;pointer-events:none;position:fixed;inset:0;background:rgba(10,9,7,0.94);z-index:300;
+  align-items:center;justify-content:center;}
+.modal.show{visibility:visible;pointer-events:all;}
+.mb{background:var(--panel);border:2px solid var(--border);padding:24px;max-width:460px;width:92%;}
+.mt{font-family:var(--fh);font-size:1.7rem;letter-spacing:3px;margin-bottom:16px;text-align:center;}
+.sr{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.srk{font-family:var(--fh);font-size:1.1rem;width:26px;}
+.si{flex:1;}
+.sn{font-family:var(--fh);font-size:0.9rem;letter-spacing:1px;}
+.sd2{font-size:0.55rem;color:var(--dim);margin-top:2px;}
+.sp{font-family:var(--fh);font-size:1.3rem;}
+.brs{margin-top:16px;width:100%;padding:10px;background:var(--acc);color:var(--bg);
+  border:none;font-family:var(--fh);font-size:0.9rem;letter-spacing:3px;cursor:pointer;}
+/* PICKER MODAL */
+.picker{display:flex;visibility:hidden;pointer-events:none;position:fixed;inset:0;background:rgba(10,9,7,0.94);z-index:400;
+  align-items:center;justify-content:center;}
+.picker.show{visibility:visible;pointer-events:all;}
+.picker-box{background:var(--panel);border:2px solid var(--border);padding:20px;max-width:380px;width:90%;}
+.picker-title{font-family:var(--fh);font-size:1.1rem;letter-spacing:2px;margin-bottom:14px;color:var(--sf);}
+.picker-item{background:var(--card);border:2px solid var(--border);border-radius:3px;padding:8px;
+  margin-bottom:6px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:8px;}
+.picker-item:hover{border-color:var(--ok);transform:translateX(3px);}
+.picker-cancel{margin-top:10px;width:100%;padding:8px;background:transparent;border:1px solid var(--dim);
+  color:var(--dim);font-family:var(--fh);font-size:0.75rem;letter-spacing:2px;cursor:pointer;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);}
+</style>
+</head>
+<body>
+<div class="root">
+<header>
+  <div class="logo">ROBOT <em>MAKER</em> <em style="font-size:0.55rem">v3</em></div>
+  <div class="sep"></div>
+  <div class="hi">Ronda <span class="hv" id="h-r">1</span>/∞</div>
+  <div class="sep"></div>
+  <div class="hi">Turno <span class="hv" id="h-t">1</span></div>
+  <div class="sep"></div>
+  <div class="hi">Fase <span class="hv" id="h-p">COLOCAÇÃO</span></div>
+  <div class="sep"></div>
+  <div class="hi">Fim em <span class="hv" id="h-ft" style="color:var(--warn)">—</span></div>
+  <div class="tos">
+    <span class="tol">Ordem →</span>
+    <div id="tos" style="display:flex;gap:4px"></div>
+  </div>
+</header>
+
+<!-- RULES -->
+<div class="pnl rules">
+  <div class="pt">Regras</div>
+  <div class="rb"><div class="rh">Robot Completo</div>
+    <div class="rt">6 slots preenchidas<br>(cabeça, tronco, 2 braços,<br>pernas, CPU) + <b>1 peça L3</b></div></div>
+  <div class="rb"><div class="rh">Circuitos — +1 Worker</div>
+    <div class="rt">
+      <b>5 circuitos únicos</b> no jogo total.<br>
+      Activado por 1 jogador → <b>esgota para todos</b>.<br>
+      Cap: máx <b>3 workers</b> por jogador.<br><br>
+      ✕ vermelho = esgotado globalmente<br>
+      ◎ dourado = pronto a activar<br>
+      ⚡ verde = activado por ti<br><br>
+      <b>Os 5 circuitos:</b><br>
+      Cabeça + Tronco + Pernas<br>
+      Cabeça + Tronco + Braço<br>
+      Tronco + Braço + Pernas<br>
+      Braço + Interface + Tronco<br>
+      Cabeça + Braço + Interface
+    </div></div>
+  <div class="rb"><div class="rh">CPU — Amplificação</div>
+    <div class="rt">
+      <b>Bio-Core</b> L1/L2 → Cabeça ×2<br>
+      <b>Bio-Core</b> L3 → Cabeça+Pernas ×2<br>
+      <b>Combat Core</b> L1/L2 → Braços ×2<br>
+      <b>Combat Core</b> L3 → Braços+Tronco ×2<br>
+      <b>Agility Core</b> L1/L2 → Pernas ×2<br>
+      <b>Agility Core</b> L3 → Pernas+Cabeça ×2<br>
+      <b>Shield Core</b> L1/L2 → Tronco ×2<br>
+      <b>Shield Core</b> L3 → Tronco+Braços ×2<br>
+      <b>Omni Core</b> L3 → Tudo ×1.5
+    </div></div>
+  <div class="rb"><div class="rh">Upgrades — Progressão</div>
+    <div class="rt">
+      Slot vazia → <b>só L1</b><br>
+      Com L1 → <b>só L2</b><br>
+      Com L2 → <b>só L3</b><br>
+      <b>Stock:</b> L1×20 · L2×10 · L3×5
+    </div></div>
+  <div class="rb"><div class="rh">Ordem de Turno</div>
+    <div class="rt">Roda <b>1 posição por ronda</b>.<br>
+      R1: P1→P2→P3→P4<br>
+      R2: P2→P3→P4→P1<br>
+      R3: P3→P4→P1→P2<br>
+      R4: P4→P1→P2→P3<br>
+      Slots definem apenas recursos.</div></div>
+  <div class="ra" id="ra">▸ Fase de colocação.</div>
+  <div class="endwarn" id="endwarn">⚠ Robot completo detectado! Todos jogam +1 turno final.</div>
+</div>
+
+<!-- BOARD -->
+<div class="pnl board">
+  <div class="pt">Tabuleiro Partilhado</div>
+  <div id="sw"></div>
+  <!-- PLAYERS under board -->
+  <div class="pt" style="margin-top:10px">Jogadores</div>
+  <div id="pw"></div>
+</div>
+
+<!-- MARKET -->
+<div class="pnl mkt">
+  <div class="pt">Mercado <span id="mc" style="font-size:0.55rem;color:var(--dim)"></span></div>
+  <div id="mw"></div>
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+  <!-- Robot anatomy -->
+  <div class="robot-wrap">
+    <div class="pt" style="padding:0 0 5px">Robot — David</div>
+    <div class="robot-grid" id="rg"></div>
+    <div id="robot-status" style="font-size:0.55rem;color:var(--dim);margin-top:5px;text-align:center"></div>
+  </div>
+
+  <div class="la">
+    <div class="lh"><span>Log de Acções</span><span id="lc" style="color:var(--acc)">0</span></div>
+    <div class="lb" id="lb"></div>
+  </div>
+
+  <div class="ab" id="ab">
+    <div class="ah" id="ah">Coloca um worker.</div>
+    <div class="br">
+      <button class="btn bsk" onclick="playerPass()">⏭ Passar</button>
+      <button class="btn be" onclick="endGame()">⬛ Fim</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PICKER MODAL -->
+<div class="picker" id="picker">
+  <div class="picker-box">
+    <div class="picker-title">🔴 FORJA — Escolhe peça L1 grátis</div>
+    <div id="picker-items"></div>
+    <button class="picker-cancel" onclick="closePicker()">CANCELAR</button>
+  </div>
+</div>
+
+<!-- END MODAL -->
+<div class="modal" id="modal">
+  <div class="mb">
+    <div class="mt">COMPILAÇÃO FINAL</div>
+    <div id="sbr"></div>
+    <button class="brs" onclick="init()">↺ NOVO JOGO</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════ DATA ═══════════════════
+
+// Robot slots definition
+const RSLOTS = [
+  {id:'head',  label:'Cabeça',    icon:'🧠', col:0, row:0, cpuZone:'head'},
+  {id:'cpu',   label:'CPU',       icon:'⚙️', col:1, row:0, isCPU:true},
+  {id:'chest', label:'Tronco',    icon:'🦺', col:2, row:0, cpuZone:'chest'},
+  {id:'arm',   label:'Braço',     icon:'💪', col:0, row:1, cpuZone:'arms'},
+  {id:'_',     label:'',          icon:'',   col:1, row:1, isEmpty:true},
+  {id:'port',  label:'Interface', icon:'🔧', col:2, row:1, cpuZone:'arms'},
+  {id:'_2',    label:'',          icon:'',   col:0, row:2, isEmpty:true},
+  {id:'legs',  label:'Pernas',    icon:'🦿', col:1, row:2, cpuZone:'legs'},
+  {id:'_3',    label:'',          icon:'',   col:2, row:2, isEmpty:true},
+];
+
+// CPU amplification zones
+const CPU_ZONES = {
+  'bio-l1':    {zones:['head'],                    factor:2,   label:'Cabeça ×2'},
+  'bio-l2':    {zones:['head'],                    factor:2.5, label:'Cabeça ×2.5'},
+  'bio-l3':    {zones:['head','legs'],             factor:3,   label:'Cabeça+Pernas ×3'},
+  'combat-l1': {zones:['arms'],                    factor:2,   label:'Braço+Interface ×2'},
+  'combat-l2': {zones:['arms'],                    factor:2.5, label:'Braço+Interface ×2.5'},
+  'combat-l3': {zones:['arms','chest'],            factor:3,   label:'Braço+Interface+Tronco ×3'},
+  'agility-l1':{zones:['legs'],                    factor:2,   label:'Pernas ×2'},
+  'agility-l2':{zones:['legs'],                    factor:2.5, label:'Pernas ×2.5'},
+  'agility-l3':{zones:['legs','head'],             factor:3,   label:'Pernas+Cabeça ×3'},
+  'shield-l1': {zones:['chest'],                   factor:2,   label:'Tronco ×2'},
+  'shield-l2': {zones:['chest'],                   factor:2.5, label:'Tronco ×2.5'},
+  'shield-l3': {zones:['chest','arms'],            factor:3,   label:'Tronco+Braço+Interface ×3'},
+  'omni-l3':   {zones:['head','chest','arms','legs'],factor:1.5,label:'Tudo ×1.5'},
+};
+
+const SLOTS_DEF = [
+  {id:'compilador',name:'Compilador',icon:'🔵',rank:1,effect:'+3 blocos L1',multi:true,
+   fn:p=>{p.l1+=3;return '+3 L1';}},
+  {id:'optimizador',name:'Optimizador',icon:'🟡',rank:2,effect:'2×L1 → 1×L2',multi:true,
+   fn:p=>{if(p.l1>=2){p.l1-=2;p.l2+=1;return '2×L1 → 1×L2';}return 'sem 2×L1 — worker gasto sem efeito';}},
+  {id:'forja',name:'Forja',icon:'🔴',rank:3,effect:'Peça L1 grátis (à escolha)',multi:false,
+   fn:(p,G)=>{ openForjaPicker(p,G); return 'picker aberto'; }},
+  {id:'deploy',name:'Deploy',icon:'🟢',rank:4,effect:'+6 pts imediatos',multi:false,
+   fn:p=>{p.score+=6;return '+6 pts';}},
+];
+
+// Normal parts by robot slot
+const PARTS = [
+  // HEAD
+  {id:'h1',slot:'head', level:1,icon:'🧠',name:'Cabeça Básica',   cost:{l1:2,l2:0},snip:'Detecção simples de ambiente',pts:3},
+  {id:'h2',slot:'head', level:2,icon:'📡',name:'Cabeça Sensor',   cost:{l1:1,l2:1},snip:'Análise táctica e targeting',pts:8},
+  {id:'h3',slot:'head', level:3,icon:'🤖',name:'Cabeça IA',       cost:{l1:1,l2:1},snip:'Decisão autónoma de máx. retorno',pts:15},
+  // CHEST
+  {id:'c1',slot:'chest',level:1,icon:'🦺',name:'Tronco Leve',     cost:{l1:2,l2:0},snip:'Absorção de impacto básica (10%)',pts:4},
+  {id:'c2',slot:'chest',level:2,icon:'🛡️',name:'Tronco Blindado', cost:{l1:0,l2:1},snip:'Redução de dano avançada (30%)',pts:8},
+  {id:'c3',slot:'chest',level:3,icon:'🔮',name:'Tronco Adaptativo',cost:{l1:1,l2:1},snip:'Aprendizagem de padrão adversário',pts:12},
+  // ARM
+  {id:'al1',slot:'arm', level:1,icon:'💪',name:'Braço Simples',   cost:{l1:2,l2:0},snip:'Força básica de combate',pts:3},
+  {id:'al2',slot:'arm', level:2,icon:'⚡',name:'Braço Laser',     cost:{l1:0,l2:1},snip:'Ataque laser de alta precisão',pts:8},
+  {id:'al3',slot:'arm', level:3,icon:'🌀',name:'Braço Plasma',    cost:{l1:1,l2:1},snip:'Ataque em área 3×3 casas',pts:12},
+  // PORT
+  {id:'ar1',slot:'port',level:1,icon:'🔧',name:'Porta Série',     cost:{l1:2,l2:0},snip:'Manipulação e hack básico',pts:4},
+  {id:'ar2',slot:'port',level:2,icon:'🔗',name:'Porta Dados',     cost:{l1:0,l2:1},snip:'Transferência de energia a aliados',pts:8},
+  {id:'ar3',slot:'port',level:3,icon:'📡',name:'Antena Quântica', cost:{l1:1,l2:1},snip:'Controlo de campo gravitacional',pts:12},
+  // LEGS
+  {id:'l1',slot:'legs', level:1,icon:'🦿',name:'Pernas Standard', cost:{l1:2,l2:0},snip:'Deslocação básica (1 zona/turno)',pts:3},
+  {id:'l2',slot:'legs', level:2,icon:'🚀',name:'Pernas Turbo',    cost:{l1:1,l2:1},snip:'Reposicionamento táctico óptimo',pts:8},
+  {id:'l3',slot:'legs', level:3,icon:'🛸',name:'Pernas Gravitação',cost:{l1:1,l2:1},snip:'Teletransporte para qualquer zona',pts:12},
+];
+
+// CPU parts
+const CPUS = [
+  // L1 — amplifica 1 zona ×2
+  {id:'bio1',  level:1,icon:'🟢',name:'Bio-Core',      cost:{l1:2,l2:0},pts:5, amp:'bio-l1',   slot:'cpu'},
+  {id:'comb1', level:1,icon:'🔴',name:'Combat Core',   cost:{l1:2,l2:0},pts:5, amp:'combat-l1',slot:'cpu'},
+  {id:'agi1',  level:1,icon:'🟡',name:'Agility Core',  cost:{l1:2,l2:0},pts:5, amp:'agility-l1',slot:'cpu'},
+  {id:'shld1', level:1,icon:'🔵',name:'Shield Core',   cost:{l1:2,l2:0},pts:5, amp:'shield-l1',slot:'cpu'},
+  // L2 — amplifica 1 zona ×2.5
+  {id:'bio2',  level:2,icon:'🟢',name:'Bio-Core MK2',  cost:{l1:1,l2:1},pts:9, amp:'bio-l2',   slot:'cpu'},
+  {id:'comb2', level:2,icon:'🔴',name:'Combat MK2',    cost:{l1:1,l2:1},pts:9, amp:'combat-l2',slot:'cpu'},
+  {id:'agi2',  level:2,icon:'🟡',name:'Agility MK2',   cost:{l1:1,l2:1},pts:9, amp:'agility-l2',slot:'cpu'},
+  {id:'shld2', level:2,icon:'🔵',name:'Shield MK2',    cost:{l1:1,l2:1},pts:9, amp:'shield-l2',slot:'cpu'},
+  // L3 — amplifica 2 zonas ×2 ou tudo ×1.5
+  {id:'bio3',  level:3,icon:'🟢',name:'Bio-Core MK3',  cost:{l1:1,l2:1},pts:14,amp:'bio-l3',   slot:'cpu'},
+  {id:'comb3', level:3,icon:'🔴',name:'Combat MK3',    cost:{l1:1,l2:1},pts:14,amp:'combat-l3',slot:'cpu'},
+  {id:'agi3',  level:3,icon:'🟡',name:'Agility MK3',   cost:{l1:1,l2:1},pts:14,amp:'agility-l3',slot:'cpu'},
+  {id:'shld3', level:3,icon:'🔵',name:'Shield MK3',    cost:{l1:1,l2:1},pts:14,amp:'shield-l3',slot:'cpu'},
+  {id:'omni3', level:3,icon:'⚪',name:'Omni Core',     cost:{l1:2,l2:1},pts:18,amp:'omni-l3',  slot:'cpu'},
+];
+
+const PDEFS=[
+  {id:'p0',name:'David', sh:'DAV',col:'var(--p0)',bg:'var(--p0d)',isAI:false,str:'player'},
+  {id:'p1',name:'BETA-7',sh:'B7', col:'var(--p1)',bg:'var(--p1d)',isAI:true, str:'aggressive'},
+  {id:'p2',name:'GRIX',  sh:'GX', col:'var(--p2)',bg:'var(--p2d)',isAI:true, str:'defensive'},
+  {id:'p3',name:'LUMIS', sh:'LM', col:'var(--p3)',bg:'var(--p3d)',isAI:true, str:'efficiency'},
+];
+
+let G={},LC=0,pickerCallback=null;
+
+function partById(id){return [...PARTS,...CPUS].find(x=>x.id===id);}
+function cur(){return G.players[G.ord[G.ci]];}
+function isP(){
+  // Player (index 0) is current if they are at position G.ci in the turn order
+  return G.ord[G.ci]===0;
+}
+
+function isPlayerActive(){
+  // More robust check - player can act if it's their turn OR they still have workers mid-turn
+  return G.ord[G.ci]===0 && G.players[0].wL>0;
+}
+
+// ═══════════════════ MARKET REVEAL ═══════════════════
+
+const NUM_PLAYERS = 4; // cópias de cada peça = nº jogadores
+
+function revealMarket(){
+  const isCPU=x=>CPUS.find(c=>c.id===x.id);
+  [1,2,3].forEach(level=>{
+    // esconder esgotadas
+    G.mkt.filter(x=>!isCPU(x)&&x.level===level&&x.revealed&&G.stock[x.id]<=0)
+      .forEach(p=>{p.revealed=false;});
+    // quantas visíveis com stock
+    const visible=G.mkt.filter(x=>!isCPU(x)&&x.level===level&&x.revealed&&G.stock[x.id]>0).length;
+    const need=Math.max(0,NUM_PLAYERS-visible);
+    // revelar das escondidas com stock, ordem aleatória
+    const hidden=G.mkt.filter(x=>!isCPU(x)&&x.level===level&&!x.revealed&&G.stock[x.id]>0);
+    hidden.sort(()=>Math.random()-0.5).slice(0,need).forEach(p=>{p.revealed=true;});
+  });
+}
+
+// ═══════════════════ CIRCUITS ═══════════════════
+// Combinações de 3 peças que formam um circuito → +1 worker (máx 1× por jogo)
+
+// 5 circuitos únicos — cada um existe 1× no jogo total
+// Quando activado por qualquer jogador, fica esgotado para todos
+const CIRCUITS = [
+  { id:'c_core',    label:'Circuito Central',     slots:['head','chest','legs'], desc:'Cabeça + Tronco + Pernas' },
+  { id:'c_upper_a', label:'Circuito de Combate',  slots:['head','chest','arm'],  desc:'Cabeça + Tronco + Braço' },
+  { id:'c_lower_a', label:'Circuito de Mobilidade',slots:['chest','arm','legs'], desc:'Tronco + Braço + Pernas' },
+  { id:'c_combat',  label:'Circuito de Armas',    slots:['arm','port','chest'],  desc:'Braço + Interface + Tronco' },
+  { id:'c_proc',    label:'Circuito de Processo', slots:['head','arm','port'],   desc:'Cabeça + Braço + Interface' },
+];
+
+function checkCircuitBonus(p){
+  if(p.circuitBonus) return null;    // jogador já tem bonus
+  if(p.workers>=3) return null;      // cap de 3 workers
+  const r=p.robot;
+  // só circuitos ainda não esgotados globalmente
+  const available=CIRCUITS.filter(c=>!G.exhaustedCircuits.includes(c.id));
+  const triggered=available.find(c=>c.slots.every(s=>r[s]!==null));
+  if(triggered){
+    p.workers=Math.min(3,p.workers+1);
+    p.wL=Math.min(p.workers,p.wL+1);
+    p.circuitBonus=triggered.id;
+    G.exhaustedCircuits.push(triggered.id);
+    return triggered;
+  }
+  return null;
+}
+
+// ═══════════════════ INIT ═══════════════════
+
+function init(){
+  document.getElementById('modal').classList.remove('show');
+  LC=0;document.getElementById('lb').innerHTML='';
+  G={
+    round:1,gTurn:0,ci:0,
+    finalRound:false,finalTurnsLeft:0,
+    exhaustedCircuits:[], // circuitos já activados — únicos no jogo
+    slots:SLOTS_DEF.map(s=>({...s,wks:[]})),
+    mkt:[
+      ...PARTS.map(p=>({...p, revealed:false})),
+      ...CPUS.map(c=>({...c,  revealed:true}))
+    ],
+    stock:Object.fromEntries([
+      ...PARTS.map(p=>[p.id, p.level===1 ? 4 : p.level===2 ? 2 : 1]),
+      ...CPUS.map(c=>[c.id, c.level===1?4:c.level===2?2:1])
+    ]),
+    players:PDEFS.map((p,i)=>({
+      ...p,l1:3,l2:0,score:0,workers:2,wL:2,
+      robot:{head:null,chest:null,arm:null,port:null,legs:null,cpu:null},
+      passed:false, circuitBonus:null, prevOrd:i,
+    })),
+    ord:[0,1,2,3],
+  };
+  revealMarket();
+  renderAll();
+  lg('s','Sistema','Jogo iniciado. Cada jogador usa todos os workers na sua vez.','REGRA: usa os 2 workers, depois passa ao próximo.');
+  prompt_();
+}
+
+// ═══════════════════ ROBOT HELPERS ═══════════════════
+
+function robotComplete(p){
+  const r=p.robot;
+  const filled=r.head&&r.chest&&r.arm&&r.port&&r.legs&&r.cpu;
+  if(!filled)return false;
+  const allParts=[r.head,r.chest,r.arm,r.port,r.legs,r.cpu];
+  return allParts.some(id=>partById(id)?.level===3);
+}
+
+function robotScore(p){
+  const r=p.robot;
+  const cpu=r.cpu?partById(r.cpu):null;
+  const ampKey=cpu?.amp;
+  const amp=ampKey?CPU_ZONES[ampKey]:null;
+
+  let total=0;
+  const slots_=[
+    {key:'head',zone:'head'},{key:'chest',zone:'chest'},
+    {key:'arm',zone:'arms'},{key:'port',zone:'arms'},{key:'legs',zone:'legs'}
+  ];
+  slots_.forEach(s=>{
+    if(!r[s.key])return;
+    const part=partById(r[s.key]);
+    if(!part)return;
+    let pts=part.pts;
+    if(amp&&amp.zones.includes(s.zone))pts=Math.round(pts*amp.factor);
+    total+=pts;
+  });
+  if(r.cpu){const cp=partById(r.cpu);if(cp)total+=cp.pts;}
+  return total;
+}
+
+function installPart(p,partId){
+  const part=partById(partId);
+  if(!part)return;
+  const robotSlot=CPUS.find(x=>x.id===partId)?'cpu':part.slot;
+  const prev=p.robot[robotSlot];
+  p.robot[robotSlot]=partId;
+  return prev;
+}
+
+// ═══════════════════ ORDER ═══════════════════
+
+function sRank(pid){
+  let b=99;
+  G.slots.forEach(s=>{if(s.wks.includes(pid)&&s.rank<b)b=s.rank;});
+  return b===99?5:b;
+}
+function reorder(){
+  // Ordem roda 1 posição por ronda — simples, previsível, sem vantagem estrutural
+  // Ronda N: [0,1,2,3] → Ronda N+1: [1,2,3,0] → etc.
+  G.ord=[G.ord[1],G.ord[2],G.ord[3],G.ord[0]];
+}
+
+// ═══════════════════ LOG ═══════════════════
+
+function lg(pi,who,what,rule){
+  LC++;
+  const el=document.getElementById('lb');
+  const cc=pi==='s'?'cs':`c${pi}`;
+  const d=document.createElement('div');d.className='le';
+  d.innerHTML=`<div class="lw ${cc}">${who}</div><div class="lx">${what}</div>${rule?`<div class="lr">${rule}</div>`:''}`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+  document.getElementById('lc').textContent=LC;
+}
+function setRA(t){document.getElementById('ra').textContent='▸ '+t;}
+
+// ═══════════════════ RENDER ═══════════════════
+
+function renderAll(){
+  rSlots();rMkt();rPlayers();rRobot();rOrder();
+  document.getElementById('h-r').textContent=G.round;
+  document.getElementById('h-t').textContent=G.gTurn+1;
+  const ab=document.getElementById('ab');
+  ab.style.display=isPlayerActive()?'':'none';
+  if(isPlayerActive()){
+    const p=G.players[0];
+    document.getElementById('ah').textContent=
+      p.wL===0?'Sem workers — passa.':
+      `${p.wL} worker(s). Clica num slot, numa peça do mercado, ou num upgrade do robot.`;
+  }
+  // end trigger check
+  const anyComplete=G.players.some(p=>robotComplete(p));
+  document.getElementById('endwarn').classList.toggle('show',anyComplete&&!G.finalRound);
+  if(G.finalRound){
+    document.getElementById('h-ft').textContent=`+${G.finalTurnsLeft} turnos`;
+  }
+}
+
+function rSlots(){
+  const el=document.getElementById('sw');el.innerHTML='';
+  G.slots.forEach(s=>{
+    const p0=G.players[0];
+    const canPlace=isPlayerActive()&&(s.multi||(s.wks.length===0&&!s.wks.includes('p0')));
+    const d=document.createElement('div');d.className='slot-c'+(canPlace?' cl':'');
+    const sc={compilador:'var(--sc)',optimizador:'var(--so)',forja:'var(--sf)',deploy:'var(--sd)'}[s.id];
+    d.innerHTML=`<div class="s-rank">#${s.rank}</div>
+      <div class="s-ico">${s.icon}</div>
+      <div class="s-nm" style="color:${sc}">${s.name}</div>
+      <div class="s-fx">${s.effect}</div>
+      <div class="s-wk">${s.wks.map(wid=>{const pl=G.players.find(x=>x.id===wid);return`<div class="wc" style="background:${pl.bg};color:${pl.col}">${pl.sh}</div>`;}).join('')}</div>
+      <div class="s-mu">${s.multi?'✦ ILIMITADO':'◆ EXCLUSIVO'}</div>`;
+    if(canPlace)d.onclick=()=>pSlot(s.id);
+    el.appendChild(d);
+  });
+}
+
+function rMkt(){
+  const el=document.getElementById('mw');el.innerHTML='';
+  const p0=G.players[0];
+  const isCPUpart=x=>CPUS.find(c=>c.id===x.id);
+
+  const tierMeta=[
+    {level:1,cls:'t1',label:'TIER 1',color:'#64b464'},
+    {level:2,cls:'t2',label:'TIER 2',color:'var(--gold)'},
+    {level:3,cls:'t3',label:'TIER 3',color:'var(--warn)'},
+  ];
+
+  // Update header count
+  const avParts=G.mkt.filter(x=>!isCPUpart(x)&&x.revealed&&G.stock[x.id]>0).length;
+  const avCPU=G.mkt.filter(x=>isCPUpart(x)&&G.stock[x.id]>0).length;
+  document.getElementById('mc').textContent=`${avParts} visíveis · ${avCPU} CPUs`;
+
+  function makePartCard(p){
+    const stock=G.stock[p.id]??0;
+    const soldOut=stock<=0;
+    const robotSlot=p.slot;
+    const installedId=p0.robot[robotSlot];
+    const installedLevel=installedId?partById(installedId)?.level:0;
+    const isUpgrade=!!installedId&&!soldOut;
+    // Opção A: progressão sequencial obrigatória
+    // Slot vazia → só L1 | L1 instalado → só L2 | L2 instalado → só L3
+    const upgradeAllowed = p.level === installedLevel + 1;
+    const can=!soldOut&&isPlayerActive()&&p0.l1>=p.cost.l1&&p0.l2>=p.cost.l2&&upgradeAllowed;
+    const d=document.createElement('div');
+    d.className='pc'+(can?' by':'')+(soldOut?' sd':'');
+    d.title=`can:${can} stock:${stock} wL:${p0.wL} L1:${p0.l1}>=${p.cost.l1} L2:${p0.l2}>=${p.cost.l2}`;
+    const upgradeLabel=isUpgrade
+      ?(upgradeAllowed
+        ?`<span style="color:var(--warn)">↑ L${installedLevel}→L${p.level}</span>`
+        :`<span style="color:var(--dim)">🔒 precisa L${installedLevel} primeiro</span>`)
+      :(!installedId&&p.level>1
+        ?`<span style="color:var(--dim)">🔒 precisa L1 primeiro</span>`
+        :'');
+    d.innerHTML=`<div class="plv">${p.slot.toUpperCase()}${upgradeLabel?' · '+upgradeLabel:''}</div>
+      <div class="pnr"><span class="pi">${p.icon}</span><span class="pn">${p.name}</span></div>
+      <div class="pcs">${p.cost.l1>0?`<span class="cb cbl1">${p.cost.l1}×L1</span>`:''}${p.cost.l2>0?`<span class="cb cbl2">${p.cost.l2}×L2</span>`:''}</div>
+      <div class="psn">${p.snip}</div>
+      <div class="ppt">+${p.pts}</div>
+      <div style="position:absolute;bottom:4px;left:6px;font-family:var(--fh);font-size:0.7rem;color:var(--dim)">×${stock}</div>`;
+    if(can)d.onclick=()=>pBuy(p.id);
+    return d;
+  }
+
+  // ── Tiers 1 / 2 / 3 ──
+  tierMeta.forEach(({level,cls,label,color})=>{
+    const revealed=G.mkt.filter(x=>!isCPUpart(x)&&x.level===level&&x.revealed&&G.stock[x.id]>0);
+    const deckLeft=G.mkt.filter(x=>!isCPUpart(x)&&x.level===level&&!x.revealed&&G.stock[x.id]>0)
+      .reduce((sum,x)=>sum+G.stock[x.id],0);
+    const soldUnits=G.mkt.filter(x=>!isCPUpart(x)&&x.level===level)
+      .reduce((sum,x)=>sum+(NUM_PLAYERS-G.stock[x.id]),0);
+
+    const section=document.createElement('div');
+    section.className='tier-section';
+    const header=document.createElement('div');
+    header.className=`tier-header ${cls}`;
+    header.innerHTML=`
+      <span class="tier-label ${cls}">${label}</span>
+      <div class="tier-deck">
+        <span style="color:${color};font-size:0.65rem">${revealed.length} visíveis</span>
+        <span>·</span>
+        <span class="deck-count ${cls}">📦 ${deckLeft}</span>
+        <span style="font-size:0.58rem;color:var(--dim)">na pilha</span>
+        ${soldUnits>0?`<span>·</span><span style="font-size:0.58rem;color:var(--dim)">${soldUnits} vendidas</span>`:''}
+      </div>`;
+    section.appendChild(header);
+    const cards=document.createElement('div');
+    cards.className='tier-cards';
+    if(revealed.length===0){
+      const empty=document.createElement('div');
+      empty.style.cssText='font-size:0.62rem;color:var(--dim);padding:6px 8px;font-style:italic;';
+      empty.textContent=deckLeft>0?'Sem cartas visíveis — repõe no próximo turno':'Esgotado';
+      cards.appendChild(empty);
+    } else {
+      revealed.forEach(p=>cards.appendChild(makePartCard(p)));
+    }
+    section.appendChild(cards);
+    el.appendChild(section);
+  });
+
+  // ── CPUs ──
+  const secCPU=document.createElement('div');
+  secCPU.className='tier-section';
+  const cpuHeader=document.createElement('div');
+  cpuHeader.className='mkt-section';
+  const cpuAvail=G.mkt.filter(x=>isCPUpart(x)&&G.stock[x.id]>0).length;
+  cpuHeader.innerHTML=`<span style="color:var(--gold);font-family:var(--fh);letter-spacing:2px">⚙ CPUs</span>
+    <span style="font-size:0.62rem;color:var(--dim)">${cpuAvail} disponíveis</span>`;
+  secCPU.appendChild(cpuHeader);
+  G.mkt.filter(x=>isCPUpart(x)).forEach(p=>{
+    const stock=G.stock[p.id]??0;
+    const soldOut=stock<=0;
+    const can=!soldOut&&isPlayerActive()&&p0.l1>=p.cost.l1&&p0.l2>=p.cost.l2;
+    const ampInfo=CPU_ZONES[p.amp];
+    const d=document.createElement('div');
+    d.className='pc cpu-card'+(can?' by':'')+(soldOut?' sd':'');
+    d.innerHTML=`<div class="plv">CPU · NV ${p.level}</div>
+      <div class="pnr"><span class="pi">${p.icon}</span><span class="pn">${p.name}</span></div>
+      <div class="pcs">${p.cost.l1>0?`<span class="cb cbl1">${p.cost.l1}×L1</span>`:''}${p.cost.l2>0?`<span class="cb cbl2">${p.cost.l2}×L2</span>`:''}</div>
+      <div class="pamp">⚡ ${ampInfo?.label||'—'}</div>
+      <div class="ppt">+${p.pts}</div>`;
+    if(can)d.onclick=()=>pBuy(p.id);
+    secCPU.appendChild(d);
+  });
+  el.appendChild(secCPU);
+}
+
+function rPlayers(){
+  const el=document.getElementById('pw');el.innerHTML='';
+  const cid=cur()?.id;
+  G.players.forEach((p,i)=>{
+    const isc=p.id===cid;
+    const rs=robotScore(p);
+    const complete=robotComplete(p);
+    const d=document.createElement('div');d.className='plc'+(isc?' ct':'');
+    if(isc)d.style.color=p.col;
+    d.innerHTML=`<div class="ph">
+      <div class="pav" style="background:${p.bg};color:${p.col}">${p.sh}</div>
+      <div>
+        <div class="pnm" style="color:${p.col}">${p.name} ${p.isAI?`<span style="font-size:0.46rem;color:var(--dim)">[${p.str}]</span>`:`<span style="font-size:0.46rem;color:var(--acc)">[TU]</span>`}</div>
+        <div class="ptg">#${G.ord.indexOf(i)+1} · ${complete?'✅ ROBOT COMPLETO':'🔧 em construção'}</div>
+      </div>
+      <div>
+        <div class="psc" style="color:${p.col}">${p.score}</div>
+        <div style="font-size:0.46rem;color:var(--gold);text-align:right">robot ${rs}pts</div>
+      </div>
+    </div>
+    <div class="prs">
+      <span class="rs">⬛ ${p.l1} L1</span>
+      <span class="rs" style="color:var(--gold)">🟡 ${p.l2} L2</span>
+      <span class="rs">🔧 ${p.wL}/${p.workers}</span>
+    </div>`;
+    el.appendChild(d);
+  });
+}
+
+function rRobot(){
+  const el=document.getElementById('rg');el.innerHTML='';
+  const p=G.players[0];
+  const cpu=p.robot.cpu?partById(p.robot.cpu):null;
+  const ampKey=cpu?.amp;
+  const amp=ampKey?CPU_ZONES[ampKey]:null;
+
+  RSLOTS.forEach(rs=>{
+    const d=document.createElement('div');
+    if(rs.isEmpty){d.style.background='transparent';el.appendChild(d);return;}
+
+    const isCPU=rs.isCPU;
+    const robotKey=rs.id;
+    const installedId=p.robot[robotKey];
+    const installed=installedId?partById(installedId):null;
+    const cpuZone=rs.cpuZone;
+    const isAmplified=amp&&cpuZone&&amp.zones.includes(cpuZone);
+
+    d.className='rslot'+(installed?' filled':'')+(isCPU?' cpu-slot':'');
+    if(isAmplified&&installed)d.style.boxShadow='0 0 8px rgba(255,208,96,0.4)';
+
+    if(installed){
+      const pts=isCPU?installed.pts:Math.round(installed.pts*(isAmplified?amp.factor:1));
+      d.innerHTML=`
+        <div class="rslot-label">${rs.label}</div>
+        <div class="rslot-content">${installed.icon}</div>
+        <div class="rslot-name">${installed.name}</div>
+        <div class="rslot-level">L${installed.level}</div>
+        <div class="rslot-pts">${pts}</div>
+        ${isAmplified?`<div class="rslot-amp">×${amp.factor}</div>`:''}
+      `;
+    } else {
+      d.innerHTML=`<div class="rslot-label">${rs.label}</div><div class="empty-slot">${rs.icon}<br>vazio</div>`;
+    }
+    el.appendChild(d);
+  });
+
+  // status + circuitos
+  const slots6=['head','chest','arm','port','legs','cpu'];
+  const filled=slots6.filter(s=>p.robot[s]).length;
+  const hasL3=slots6.some(s=>p.robot[s]&&partById(p.robot[s])?.level===3);
+  const status=document.getElementById('robot-status');
+
+  // circuitos
+  const circuitHTML=CIRCUITS.map(c=>{
+    const isActive=p.circuitBonus===c.id;
+    const exhausted=G.exhaustedCircuits.includes(c.id);
+    const ready=!exhausted&&c.slots.every(s=>p.robot[s]!==null);
+    return `<span style="font-size:0.58rem;padding:2px 5px;border-radius:2px;margin:2px;display:inline-block;
+      background:${isActive?'rgba(80,255,144,0.15)':exhausted?'rgba(255,96,96,0.08)':ready?'rgba(255,208,96,0.1)':'rgba(50,42,34,0.5)'};
+      color:${isActive?'var(--ok)':exhausted?'var(--warn)':ready?'var(--gold)':'var(--dim)'};
+      border:1px solid ${isActive?'var(--ok)':exhausted?'var(--warn)':ready?'var(--gold)':'var(--border)'}">
+      ${isActive?'⚡':exhausted?'✕':ready?'◎':'○'} ${c.label}
+    </span>`;
+  }).join('');
+
+  status.innerHTML=`
+    <div style="margin-bottom:4px">${filled}/6 slots · ${hasL3?'✅ tem L3':'⚠ falta L3'} · Score robot: ${robotScore(p)}pts · Workers: ${p.workers}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center">${circuitHTML}</div>
+    ${p.circuitBonus?`<div style="font-size:0.58rem;color:var(--ok);margin-top:4px">⚡ Circuito activo — 3 workers desbloqueados</div>`:'<div style="font-size:0.55rem;color:var(--dim);margin-top:3px">Liga 3 peças para desbloquear +1 worker</div>'}
+  `;
+}
+
+function rOrder(){
+  const el=document.getElementById('tos');el.innerHTML='';
+  G.ord.forEach((pi,i)=>{
+    const p=G.players[pi];const isc=i===G.ci;
+    const d=document.createElement('div');d.className='tob'+(isc?' cur':'');
+    d.style.background=p.bg;d.style.color=p.col;d.style.borderColor=isc?p.col:'transparent';
+    d.title=`#${i+1} ${p.name}`;d.textContent=p.sh;el.appendChild(d);
+  });
+}
+
+// ═══════════════════ FORJA PICKER ═══════════════════
+
+function openForjaPicker(p,G_){
+  const free=G_.mkt.filter(x=>G_.stock[x.id]>0&&!CPUS.find(c=>c.id===x.id)&&x.level===1);
+  if(free.length===0){
+    lg(0,'David','Forja: sem peças L1 disponíveis no mercado.','');
+    afterAction();return;
+  }
+  const el=document.getElementById('picker-items');el.innerHTML='';
+  free.forEach(pt=>{
+    const d=document.createElement('div');d.className='picker-item';
+    const robotKey=pt.slot;
+    const hasSlot=p.robot[robotKey]!==null;
+    d.innerHTML=`<span style="font-size:1.2rem">${pt.icon}</span>
+      <div>
+        <div style="font-family:var(--fh);font-size:0.8rem">${pt.name} <span style="font-size:0.55rem;color:var(--dim)">· ${pt.slot.toUpperCase()}</span></div>
+        <div style="font-size:0.55rem;color:var(--ok)">${pt.snip}</div>
+        ${hasSlot?`<div style="font-size:0.5rem;color:var(--warn)">UPGRADE — substitui snippet anterior</div>`:''}
+      </div>
+      <div style="font-family:var(--fh);color:var(--gold);font-size:0.85rem">+${pt.pts}</div>`;
+    d.onclick=()=>{
+      G.stock[pt.id]--;
+      const prev=installPart(p,pt.id);
+      let msg=`Forja → ${pt.icon}${pt.name} grátis [×${G.stock[pt.id]} restantes]`;
+      if(prev){const prevP=partById(prev);msg+=` (substitui ${prevP?.name})`;}
+      const circuit=checkCircuitBonus(p);
+      if(circuit) lg(0,'David',`⚡ CIRCUITO ACTIVADO: ${circuit.label} → +1 worker! (total: ${p.workers})`,'REGRA: 3 peças ligadas = +1 worker. Máx 1× por jogo.');
+      lg(0,'David',msg,'REGRA: Forja — peça L1 grátis.');
+      closePicker();
+      checkEndTrigger();
+      afterAction();
+    };
+    el.appendChild(d);
+  });
+  document.getElementById('picker').classList.add('show');
+}
+
+function closePicker(){document.getElementById('picker').classList.remove('show');}
+
+// ═══════════════════ PLAYER ACTIONS ═══════════════════
+
+function pSlot(sid){
+  const p=G.players[0],s=G.slots.find(x=>x.id===sid);
+  if(!s||p.wL<=0)return;
+  if(!s.multi&&s.wks.length>0){lg(0,'David','Slot exclusivo já ocupado.','REGRA: Forja/Deploy = 1 worker máx.');return;}
+  if(!s.multi&&s.wks.includes('p0'))return;
+  const alreadyThere=s.wks.includes('p0');
+  s.wks.push('p0');p.wL--;
+  if(sid==='forja'){
+    // picker handles afterAction
+    s.fn(p,G);return;
+  }
+  const r=s.fn(p,G);
+  lg(0,'David',`${alreadyThere?'2º worker':'worker'} → ${s.name}: ${r}`,`REGRA: define ordem de turno #${s.rank}. ${s.multi?`Ilimitado — ${alreadyThere?'efeito duplicado (+3 L1 extra)':'1º worker'}.`:'Exclusivo.'}`);
+  afterAction();
+}
+
+function pBuy(pid){
+  const p=G.players[0],pm=G.mkt.find(x=>x.id===pid);
+  if(!pm||!G.stock[pid]||G.stock[pid]<=0||p.wL<=0)return;
+  if(!isPlayerActive()){lg(0,'David','Não é o teu turno ou sem workers.','');return;}
+  if(p.l1<pm.cost.l1||p.l2<pm.cost.l2){
+    lg(0,'David',`Blocos insuficientes. Tens ${p.l1}×L1 e ${p.l2}×L2, precisas ${pm.cost.l1}×L1 e ${pm.cost.l2}×L2.`,'');return;
+  }
+  const isCPUPart=CPUS.find(x=>x.id===pm.id);
+  const rSlotKey=isCPUPart?'cpu':pm.slot;
+  const installedId=p.robot[rSlotKey];
+  if(installedId){
+    const installedLevel=partById(installedId)?.level||0;
+    if(pm.level!==installedLevel+1){
+      lg(0,'David',`Prerequisito em falta — tens L${installedLevel}, precisas de instalar L${installedLevel+1} primeiro.`,'REGRA: progressão sequencial obrigatória L1→L2→L3.');
+      return;
+    }
+  } else if(pm.level>1){
+    lg(0,'David',`Prerequisito em falta — slot vazia, tens de instalar L1 primeiro.`,'REGRA: progressão sequencial obrigatória — começa sempre por L1.');
+    return;
+  }
+  p.l1-=pm.cost.l1;p.l2-=pm.cost.l2;
+  G.stock[pid]--;
+  const prev=installPart(p,pid);
+  p.wL--;
+  let msg=`mercado → ${pm.icon}${pm.name} (L${pm.level}) [×${G.stock[pid]} restantes]`;
+  if(prev){const pp=partById(prev);msg+=` · upgrade (substitui ${pp?.name})`;}
+  // verificar circuito
+  const circuit=checkCircuitBonus(p);
+  if(circuit) lg(0,'David',`⚡ CIRCUITO ACTIVADO: ${circuit.label} (${circuit.desc}) → +1 worker permanente! Tens agora ${p.workers} workers.`,'REGRA: 3 peças ligadas = +1 worker. Máximo 1× por jogo.');
+  lg(0,'David',msg,'REGRA: 1 worker gasto. Stock decrementado.');
+  checkEndTrigger();
+  afterAction();
+}
+
+function playerPass(){
+  G.players[0].wL=0;
+  lg(0,'David','passa — fim de turno.','');
+  next_();
+}
+
+function afterAction(){
+  renderAll();
+  // Se o jogador ainda tem workers, continua na sua vez
+  if(G.ord[G.ci]===0 && G.players[0].wL>0){
+    prompt_();
+    return;
+  }
+  next_();
+}
+
+function prompt_(){setRA('É a tua vez — usa os teus workers.');renderAll();}
+
+// ═══════════════════ END TRIGGER ═══════════════════
+
+function checkEndTrigger(){
+  if(G.finalRound)return;
+  if(G.players.some(p=>robotComplete(p))){
+    G.finalRound=true;
+    G.finalTurnsLeft=G.players.length;
+    lg('s','Sistema','⚠ Robot completo! Todos jogam +1 turno final.','REGRA: ronda final completa antes de pontuação.');
+  }
+}
+
+// ═══════════════════ AI ═══════════════════
+
+function aiGo(pi){
+  const p=G.players[pi];
+  if(p.wL<=0){next_();return;}
+  setTimeout(()=>{
+    let done=false;
+    const trySlot=sid=>{
+      const s=G.slots.find(x=>x.id===sid);
+      if(!s)return false;
+      if(!s.multi&&s.wks.includes(p.id))return false;
+      if(!s.multi&&s.wks.length>0)return false;
+      s.wks.push(p.id);p.wL--;
+      if(sid==='forja'){
+        const free=G.mkt.find(x=>!CPUS.find(c=>c.id===x.id)&&x.level===1&&G.stock[x.id]>0);
+        if(free){
+          G.stock[free.id]--;const prev=installPart(p,free.id);
+          const circuit=checkCircuitBonus(p);
+          let fm=`[${p.str}] Forja → ${free.icon}${free.name} grátis [×${G.stock[free.id]}]`;
+          if(circuit)fm+=` ⚡ CIRCUITO +1 worker!`;
+          lg(pi,p.name,fm,'IA.');
+        }else lg(pi,p.name,`[${p.str}] Forja: sem L1`,'');
+        return true;
+      }
+      const r=s.fn(p,G);
+      lg(pi,p.name,`[${p.str}] slot ${s.name}: ${r}`,`Rank #${s.rank}`);
+      return true;
+    };
+    const tryBuy=ids=>{
+      for(const id of ids){
+        const pm=G.mkt.find(x=>x.id===id);
+        if(pm&&G.stock[id]>0&&p.l1>=pm.cost.l1&&p.l2>=pm.cost.l2){
+          const isCPUP=CPUS.find(x=>x.id===id);
+          const rk=isCPUP?'cpu':pm.slot;
+          const inst=p.robot[rk];
+          const instLv=inst?partById(inst)?.level:0;
+          if(inst&&pm.level!==instLv+1)continue;
+          if(!inst&&pm.level>1)continue;
+          p.l1-=pm.cost.l1;p.l2-=pm.cost.l2;G.stock[id]--;
+          const prev=installPart(p,id);p.wL--;
+          let m=`[${p.str}] mercado → ${pm.icon}${pm.name} [×${G.stock[id]}]`;
+          if(prev)m+=` (upgrade)`;
+          const circuit=checkCircuitBonus(p);
+          if(circuit)lg(pi,p.name,`⚡ CIRCUITO: ${circuit.label} → +1 worker! (total: ${p.workers})`,'');
+          lg(pi,p.name,m,`IA estratégia "${p.str}".`);
+          return true;
+        }
+      }return false;
+    };
+    if(p.str==='aggressive'){
+      done=tryBuy(['al1','al2','al3','ar1','ar2','ar3','comb1','comb3'])||trySlot('compilador')||trySlot('optimizador');
+    }else if(p.str==='defensive'){
+      done=tryBuy(['c1','l1','c2','l2','c3','l3','shld1','shld3'])||(p.l1>=2&&trySlot('optimizador'))||trySlot('compilador');
+    }else{
+      done=(p.l1>=2&&trySlot('optimizador'))||tryBuy(['h1','h2','h3','bio1','bio3'])||trySlot('compilador');
+    }
+    if(!done)done=trySlot('compilador')||trySlot('optimizador');
+    if(!done){
+      const any=G.mkt.find(x=>G.stock[x.id]>0&&p.l1>=x.cost.l1&&p.l2>=x.cost.l2);
+      if(any)done=tryBuy([any.id]);
+    }
+    if(!done){p.wL=0;p.passed=true;lg(pi,p.name,`[${p.str}] passa.`,'');}
+    if(p.wL===0)p.passed=true;
+    checkEndTrigger();
+    renderAll();
+    // usa todos os workers antes de passar ao próximo
+    if(p.wL>0)setTimeout(()=>aiGo(pi),600);
+    else next_();
+  },600);
+}
+
+// ═══════════════════ TURN MANAGEMENT ═══════════════════
+
+function next_(){
+  G.ci++;
+  if(G.ci>=G.ord.length){endRound();return;}
+  G.gTurn++;
+  revealMarket();
+  renderAll();
+  setRA(`Turno de ${cur().name}...`);
+  if(cur().isAI)setTimeout(()=>aiGo(G.ord[G.ci]),400);
+  else prompt_();
+}
+
+function endRound(){
+  if(G.finalRound){
+    G.finalTurnsLeft--;
+    if(G.finalTurnsLeft<=0){endGame();return;}
+  }
+  lg('s','Sistema',`── Fim Ronda ${G.round} ──`,
+    G.finalRound?`Turno final em progresso.`:'REGRA: workers regressam. Pool não recebe novas peças.');
+  reorder();
+  G.slots.forEach(s=>s.wks=[]);
+  G.players.forEach(p=>{p.wL=p.workers; p.passed=false;});
+  // Sem bonus por ronda — workers extra vêm de circuitos do robot
+  G.round++;G.ci=0;G.gTurn++;
+  revealMarket();
+  renderAll();
+  const ord=G.ord.map(i=>G.players[i].sh).join(' → ');
+  lg('s','Sistema',`Ronda ${G.round}. Ordem: ${ord}`,
+    'Ordem roda 1 posição por ronda — sem vantagem estrutural.');
+  setRA(`Ronda ${G.round}. Ordem: ${ord}`);
+  if(cur().isAI)setTimeout(()=>aiGo(G.ord[G.ci]),600);
+  else prompt_();
+}
+
+function endGame(){
+  G.players.forEach(p=>{
+    p.robotFinalScore=robotScore(p);
+    p.score+=p.robotFinalScore;
+    // Bónus de conclusão (reduzidos para equilíbrio de spread)
+    const slots6=['head','chest','arm','port','legs','cpu'];
+    const filled=slots6.filter(x=>p.robot[x]).length;
+    const hasL3=slots6.some(x=>p.robot[x]&&partById(p.robot[x])?.level===3);
+    if(filled===6) p.score+=8;      // robot completo +8 (era +15)
+    if(hasL3)      p.score+=5;      // tem L3 +5 (era +10)
+    p.completionBonus=(filled===6?8:0)+(hasL3?5:0);
+  });
+  const s=[...G.players].sort((a,b)=>b.score-a.score);
+  const rk=['🥇','🥈','🥉','4️⃣'];
+  document.getElementById('sbr').innerHTML=s.map((p,i)=>{
+    const r=p.robot;
+    const slots6=['head','chest','arm','port','legs','cpu'];
+    const filled=slots6.filter(x=>r[x]).length;
+    return`<div class="sr">
+      <span class="srk">${rk[i]}</span>
+      <div class="si">
+        <div class="sn" style="color:${p.col}">${p.name}</div>
+        <div class="sd2">${filled}/6 slots · robot +${p.robotFinalScore}pts · bónus +${p.completionBonus}pts · ${p.isAI?p.str:'jogador'}</div>
+      </div>
+      <div class="sp" style="color:${p.col}">${p.score}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('modal').classList.add('show');
+}
+
+init();
+</script>
+</body>
+</html>
